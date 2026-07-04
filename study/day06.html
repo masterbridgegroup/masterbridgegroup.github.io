@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 · 요구사항이란? (요구공학 입문)</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 6 · 1과목 소프트웨어 설계</span>
+    <h1>요구사항이란? (요구공학 입문)</h1>
+    <p>2026-07-09 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제의 핵심은 <b>GPL 라이선스</b> — 이 오픈소스를 쓰면 내 프로그램의 소스 코드도 공개해야 한다는 것이었죠. BSD·Apache는 공개 의무가 없고요. 오늘부터는 1과목의 심장인 <b>요구사항</b> 이야기를 시작해요. 다음 주 내내 이어질 중요한 주제입니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 요구사항이란?</h2>
+    <p>요구사항(requirement)은 <b>"소프트웨어가 무엇을 해야 하고, 어떤 조건을 만족해야 하는지"</b>를 적은 것이에요. 고객의 바람을 개발자가 이해할 수 있는 말로 정리한 약속이죠.</p>
+    <div class="easy"><b>비유</b> — 인테리어 공사 계약 전에 적는 요청 목록이에요. "방 2개를 터서 거실을 넓히고(기능), 공사는 3주 안에, 소음은 낮에만(조건)" — 이걸 안 적으면 나중에 싸움 나죠. 소프트웨어도 똑같아요.</div>
+    <div class="point"><b>시험 포인트</b> — 프로젝트 실패의 가장 큰 원인이 '요구사항을 잘못 파악한 것'이라는 게 단골 상식 문제예요.</div>
+  </section>
+
+  <section>
+    <h2>2. 기능적 vs 비기능적 요구사항 ⭐</h2>
+    <p>요구사항을 나누는 가장 중요한 기준이에요.</p>
+    <table>
+      <tr><th></th><th>기능적 요구사항</th><th>비기능적 요구사항</th></tr>
+      <tr><td>질문</td><td>"무엇을 하는가?"</td><td>"얼마나 잘 하는가?"</td></tr>
+      <tr><td>내용</td><td>시스템이 제공할 기능·동작</td><td>성능·보안·품질·제약 조건</td></tr>
+      <tr><td>예시</td><td>"로그인할 수 있어야 한다", "주문 내역을 조회할 수 있어야 한다"</td><td>"3초 안에 응답해야 한다", "동시 접속 1만 명을 견뎌야 한다", "개인정보는 암호화해야 한다"</td></tr>
+    </table>
+    <div class="easy"><b>구분 요령</b> — 문장에 <b>숫자·속도·보안·품질</b> 냄새가 나면 비기능! "~할 수 있다(기능 동작)"면 기능적!</div>
+    <div class="point"><b>시험 포인트</b> — 예시를 주고 "기능적이냐 비기능적이냐"를 묻는 문제가 매년 나와요. 성능·보안·품질 = 비기능.</div>
+  </section>
+
+  <section>
+    <h2>3. 사용자 요구사항 vs 시스템 요구사항</h2>
+    <p>같은 내용도 <b>누구를 위해 쓰느냐</b>에 따라 두 가지로 나뉘어요.</p>
+    <p>① <b>사용자 요구사항</b> — 고객이 이해하도록 <b>쉬운 일상 언어</b>로 쓴 것. "회원은 비밀번호를 바꿀 수 있다."<br>
+    ② <b>시스템 요구사항</b> — 개발자를 위해 <b>기술적으로 상세하게</b> 쓴 것. "비밀번호 변경 시 8자 이상, 영문+숫자+특수문자 조합을 검증하고, 변경 이력을 DB에 기록한다."</p>
+    <div class="easy"><b>비유</b> — 손님이 "맵지 않게 해주세요"(사용자 요구사항)라고 하면, 주방 레시피에는 "고춧가루 5g → 1g로 변경"(시스템 요구사항)이라고 적히는 거예요.</div>
+  </section>
+
+  <section>
+    <h2>4. 요구공학과 개발 4단계 미리보기</h2>
+    <p><b>요구공학</b>(Requirements Engineering)은 요구사항을 체계적으로 다루는 학문이에요. 요구사항은 4단계로 개발됩니다. (다음 주에 하나씩 자세히 배워요!)</p>
+    <p><b>도출</b>(고객에게서 끄집어내기) → <b>분석</b>(모순 없는지 따져보기) → <b>명세</b>(문서로 적기) → <b>확인</b>(제대로 적었는지 검토)</p>
+    <div class="easy"><b>외우는 법</b> — "도분명확"! 끄집어내고, 따져보고, 적고, 검토한다.</div>
+    <div class="point"><b>시험 포인트</b> — 4단계 순서 문제 초단골: 도출 → 분석 → 명세 → 확인.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어가 무엇을 해야 하고 어떤 조건을 만족해야 하는지 정리한 것은?",
+  o:["아키텍처","요구사항","라이선스","프로토콜"],
+  a:1, e:"requirement — 고객의 바람을 정리한 약속입니다."},
+ {q:"2. '사용자는 상품을 장바구니에 담을 수 있어야 한다'는 어떤 요구사항?",
+  o:["기능적 요구사항","비기능적 요구사항","보안 요구사항","성능 요구사항"],
+  a:0, e:"'무엇을 하는가'에 대한 것 = 기능적 요구사항."},
+ {q:"3. '검색 결과는 2초 이내에 표시되어야 한다'는 어떤 요구사항?",
+  o:["기능적 요구사항","비기능적 요구사항","사용자 요구사항","도출 요구사항"],
+  a:1, e:"속도(성능)에 대한 것 = 비기능적 요구사항."},
+ {q:"4. 비기능적 요구사항에 해당하지 않는 것은?",
+  o:["동시 접속 1만 명 처리","개인정보 암호화","회원 가입 기능 제공","99.9% 가동률 유지"],
+  a:2, e:"'가입 기능 제공'은 시스템이 하는 일 = 기능적 요구사항이에요."},
+ {q:"5. 고객이 이해하기 쉽게 일상 언어로 쓴 요구사항은?",
+  o:["시스템 요구사항","사용자 요구사항","기술 명세서","코드 주석"],
+  a:1, e:"사용자(고객)를 위한 쉬운 표현 = 사용자 요구사항."},
+ {q:"6. 개발자를 위해 기술적으로 상세하게 작성한 요구사항은?",
+  o:["사용자 요구사항","시스템 요구사항","희망 사항","계약서"],
+  a:1, e:"레시피처럼 상세하게 = 시스템 요구사항."},
+ {q:"7. 요구사항 개발 4단계의 올바른 순서는?",
+  o:["분석 → 도출 → 명세 → 확인","도출 → 분석 → 명세 → 확인","명세 → 도출 → 분석 → 확인","도출 → 명세 → 분석 → 확인"],
+  a:1, e:"도분명확! 끄집어내고 → 따져보고 → 적고 → 검토."},
+ {q:"8. 요구사항 개발 중 '문서로 기록하는' 단계는?",
+  o:["도출","분석","명세","확인"],
+  a:2, e:"명세(明細) = 명확하고 자세하게 적는 것."},
+ {q:"9. 요구사항을 체계적으로 다루는 분야를 부르는 말은?",
+  o:["요구공학","건축공학","유전공학","금융공학"],
+  a:0, e:"Requirements Engineering = 요구공학입니다."},
+ {q:"10. 소스 코드 공개 의무가 있는 가장 엄격한 오픈소스 라이선스는? (복습!)",
+  o:["BSD","Apache","GPL","MIT"],
+  a:2, e:"Day 5 복습! GPL을 쓰면 내 소스도 공개해야 해요."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

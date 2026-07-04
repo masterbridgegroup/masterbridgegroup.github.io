@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 · 개발 기술 환경 (OS·DBMS·미들웨어·오픈소스)</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 5 · 1과목 소프트웨어 설계</span>
+    <h1>개발 기술 환경 (OS·DBMS·미들웨어·오픈소스)</h1>
+    <p>2026-07-08 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제는 현행 시스템 파악 <b>3단계</b>를 배웠죠. ① 구성·기능·인터페이스 → ② 아키텍처·소프트웨어 → ③ 하드웨어·네트워크, "구기인→아소→하네"! 오늘은 새 시스템을 만들 때 <b>어떤 기술 제품을 고를지 판단하는 기준</b>을 배워요.</p>
+  </section>
+
+  <section>
+    <h2>1. 운영체제(OS) 선정 기준</h2>
+    <p>운영체제(Operating System)는 <b>컴퓨터를 움직이는 기본 프로그램</b>이에요. Windows, Linux(리눅스), macOS, Android, iOS가 대표적이죠. 시스템에 쓸 OS를 고를 때 따지는 5가지:</p>
+    <table>
+      <tr><th>기준</th><th>뜻</th></tr>
+      <tr><td><b>신뢰도</b></td><td>갑자기 멈추거나 오류 나지 않는가</td></tr>
+      <tr><td><b>성능</b></td><td>동시에 많은 작업을 잘 처리하는가</td></tr>
+      <tr><td><b>기술 지원</b></td><td>문제 생기면 도와줄 회사·커뮤니티가 있는가</td></tr>
+      <tr><td><b>주변 기기</b></td><td>프린터 등 장비를 잘 지원하는가</td></tr>
+      <tr><td><b>구축 비용</b></td><td>가격이 적당한가</td></tr>
+    </table>
+    <div class="easy"><b>외우는 법</b> — "신성기주구" (신뢰도·성능·기술지원·주변기기·구축비용). 자동차 고르기와 똑같아요: 고장 안 나고, 잘 달리고, AS 되고, 부품 많고, 가격 맞고!</div>
+  </section>
+
+  <section>
+    <h2>2. DBMS 선정 기준</h2>
+    <p>DBMS(데이터베이스 관리 시스템)는 <b>데이터를 저장하고 관리해주는 프로그램</b>이에요. Oracle(오라클), MySQL, PostgreSQL 등이 있어요. 선정 기준 5가지:</p>
+    <p><b>가용성</b>(장애 없이 계속 쓸 수 있나) · <b>성능</b>(빠른가) · <b>기술 지원</b> · <b>상호 호환성</b>(다른 시스템·OS와 잘 맞나) · <b>구축 비용</b></p>
+    <div class="easy"><b>OS 기준과 비교</b> — 거의 같은데 두 개가 달라요. OS는 '신뢰도·주변기기', DBMS는 '가용성·상호 호환성'. 데이터는 24시간 살아있어야 하니 가용성, 여러 프로그램과 연결되니 호환성!</div>
+    <div class="point"><b>시험 포인트</b> — OS 기준과 DBMS 기준을 바꿔치기해서 내는 문제가 나와요. 위 차이 2개만 구분하면 됩니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 미들웨어와 WAS</h2>
+    <p>미들웨어(middleware)는 이름 그대로 <b>중간(middle)에서 프로그램들을 연결해주는 소프트웨어</b>예요. 그중 시험에 자주 나오는 게 <b>WAS</b>(웹 애플리케이션 서버) — 웹사이트에서 로그인, 주문 처리처럼 <b>동적인(그때그때 달라지는) 작업</b>을 처리하는 서버예요. Tomcat(톰캣), JEUS(제우스) 등이 있어요.</p>
+    <div class="easy"><b>비유</b> — 식당의 홀 직원이에요. 손님(웹 브라우저)과 주방(데이터베이스) 사이에서 주문을 전달하고 음식을 나르죠.</div>
+    <div class="point"><b>시험 포인트</b> — WAS 선정 기준에는 특히 "안정성"이 중요해요. 그리고 "정적 페이지는 웹 서버, 동적 처리는 WAS"로 구분합니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 오픈소스 라이선스</h2>
+    <p>오픈소스는 <b>소스 코드(프로그램 설계도)가 공개되어 무료로 쓸 수 있는 소프트웨어</b>예요. 단, 공짜라도 <b>라이선스(사용 조건)</b>를 지켜야 해요.</p>
+    <table>
+      <tr><th>라이선스</th><th>특징</th></tr>
+      <tr><td><b>GPL</b></td><td>이걸 써서 만든 프로그램도 소스 코드를 공개해야 함 (가장 엄격)</td></tr>
+      <tr><td><b>LGPL</b></td><td>GPL보다 완화 — 라이브러리로만 쓰면 공개 안 해도 됨</td></tr>
+      <tr><td><b>BSD / Apache</b></td><td>자유로움 — 소스 공개 의무 없음 (저작권 표시는 필요)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "GPL은 소스 공개 의무가 있다"가 핵심. 오픈소스 선택 시 라이선스 종류·사용자 수·기술 지속 가능성을 검토해요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 컴퓨터를 움직이는 기본 프로그램(예: Windows, Linux)을 부르는 말은?",
+  o:["DBMS","운영체제(OS)","미들웨어","브라우저"],
+  a:1, e:"Operating System — 컴퓨터의 기본 운영을 담당해요."},
+ {q:"2. 운영체제 선정 기준 5가지에 들지 않는 것은?",
+  o:["신뢰도","성능","디자인 색상","구축 비용"],
+  a:2, e:"신성기주구! 색상은 기준이 아니에요."},
+ {q:"3. 데이터를 저장·관리해주는 프로그램(예: Oracle, MySQL)은?",
+  o:["운영체제","DBMS","WAS","컴파일러"],
+  a:1, e:"DataBase Management System = 데이터베이스 관리 시스템."},
+ {q:"4. DBMS 선정 기준에는 있지만 OS 선정 기준에는 없는 것은?",
+  o:["성능","기술 지원","상호 호환성","구축 비용"],
+  a:2, e:"DBMS는 여러 시스템과 연결되므로 '상호 호환성'(그리고 가용성)을 따져요."},
+ {q:"5. DBMS의 '가용성'이란?",
+  o:["장애 없이 계속 사용할 수 있는 정도","화면이 예쁜 정도","가격이 싼 정도","용량이 큰 정도"],
+  a:0, e:"available(사용 가능한) — 멈추지 않고 계속 쓸 수 있는가입니다."},
+ {q:"6. 프로그램들 중간에서 연결을 담당하는 소프트웨어는?",
+  o:["미들웨어","하드웨어","펌웨어","프리웨어"],
+  a:0, e:"middle(중간) + ware(제품). 중간 연결자예요."},
+ {q:"7. 웹에서 로그인·주문 처리 같은 동적인 작업을 처리하는 서버는?",
+  o:["웹 서버","WAS(웹 애플리케이션 서버)","파일 서버","메일 서버"],
+  a:1, e:"동적 처리 = WAS. 정적 페이지만 주는 건 웹 서버예요."},
+ {q:"8. WAS 제품이 아닌 것은?",
+  o:["Tomcat","JEUS","Oracle","WebLogic"],
+  a:2, e:"Oracle은 DBMS(데이터베이스)예요. 나머지는 WAS 제품입니다."},
+ {q:"9. 이 라이선스의 오픈소스를 쓰면 내 프로그램의 소스 코드도 공개해야 한다. 무엇일까요?",
+  o:["BSD","Apache","GPL","MIT"],
+  a:2, e:"GPL이 가장 엄격 — 파생 프로그램도 소스 공개 의무가 있어요."},
+ {q:"10. 현행 시스템 파악에서 하드웨어·네트워크는 몇 단계? (복습!)",
+  o:["1단계","2단계","3단계","4단계"],
+  a:2, e:"Day 4 복습! 구기인(1) → 아소(2) → 하네(3). 하드웨어·네트워크는 3단계."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 · 스크럼과 XP 자세히 보기</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 2 · 1과목 소프트웨어 설계</span>
+    <h1>스크럼과 XP 자세히 보기</h1>
+    <p>2026-07-05 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 배운 <b>애자일</b>은 짧은 주기로 조금씩 만들어 자주 보여주는 방식이었죠. 애자일이 더 중요하게 여기는 4가지는 <b>개인과 상호작용, 작동하는 소프트웨어, 고객과의 협력, 변화에 대응</b>이었어요. 오늘은 애자일의 두 대표선수인 스크럼과 XP를 깊게 들여다봅니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 스크럼의 세 가지 역할</h2>
+    <p>스크럼 팀에는 딱 3가지 역할이 있어요.</p>
+    <table>
+      <tr><th>역할</th><th>하는 일</th></tr>
+      <tr><td><b>제품 책임자(PO)</b></td><td>"무엇을 만들지" 결정. 요구사항 목록(백로그)의 우선순위를 정함</td></tr>
+      <tr><td><b>스크럼 마스터(SM)</b></td><td>팀이 일 잘하게 돕는 도우미. 방해 요소를 치워줌 (팀장·지시자가 아님!)</td></tr>
+      <tr><td><b>개발팀</b></td><td>실제로 만드는 사람들 (보통 7~9명)</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 식당으로 치면 PO는 메뉴를 정하는 사장, 스크럼 마스터는 주방이 원활히 돌아가게 돕는 지배인, 개발팀은 요리사들이에요.</div>
+    <div class="point"><b>시험 포인트</b> — "스크럼 마스터는 팀을 통제하는 관리자다" = 틀린 설명! 돕는 사람이지 지시하는 사람이 아니에요.</div>
+  </section>
+
+  <section>
+    <h2>2. 스크럼이 굴러가는 순서</h2>
+    <p><b>제품 백로그</b>(할 일 전체 목록) → <b>스프린트 계획 회의</b> → <b>스프린트</b>(1~4주 개발) → 매일 15분 <b>일일 스크럼 회의</b> → <b>스프린트 검토 회의</b>(결과물 시연) → <b>스프린트 회고</b>(잘한 점·개선점 돌아보기)</p>
+    <div class="easy"><b>용어 풀이</b> — 백로그(backlog)는 '밀린 일 목록', 스프린트(sprint)는 '전력 질주'라는 뜻이에요. 짧게 전력 질주하고, 돌아보고, 또 질주하는 거죠.</div>
+    <p>진행 상황은 <b>번다운 차트</b>(남은 작업량이 시간에 따라 줄어드는 그래프)로 확인해요.</p>
+    <div class="point"><b>시험 포인트</b> — 순서 문제 단골: 계획 → 스프린트 → 일일 회의 → 검토 → 회고. 그리고 "남은 작업량 그래프 = 번다운 차트".</div>
+  </section>
+
+  <section>
+    <h2>3. XP의 실천 기법</h2>
+    <p>XP(익스트림 프로그래밍)는 어제 배운 5가지 가치(용기·단순성·의사소통·피드백·존중) 위에 구체적인 실천 방법들을 얹어요. 시험에 자주 나오는 것만 추리면:</p>
+    <table>
+      <tr><th>기법</th><th>뜻</th></tr>
+      <tr><td><b>짝 프로그래밍</b></td><td>두 명이 한 컴퓨터로 함께 코딩 (한 명은 작성, 한 명은 검토)</td></tr>
+      <tr><td><b>테스트 주도 개발(TDD)</b></td><td>코드를 만들기 전에 테스트부터 먼저 작성</td></tr>
+      <tr><td><b>지속적 통합(CI)</b></td><td>여러 사람이 만든 코드를 자주 합쳐서 문제를 일찍 발견</td></tr>
+      <tr><td><b>리팩토링</b></td><td>기능은 그대로 두고 코드 내부만 깔끔하게 정리</td></tr>
+      <tr><td><b>소규모 릴리즈</b></td><td>조금씩 자주 배포(공개)</td></tr>
+      <tr><td><b>공동 코드 소유</b></td><td>코드는 팀 전체의 것 — 누구나 고칠 수 있음</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "리팩토링은 기능을 바꾸는 것이다" = 틀림! 기능은 그대로, 내부 구조만 개선하는 거예요.</div>
+  </section>
+
+  <section>
+    <h2>4. 스크럼 vs XP 한눈 비교</h2>
+    <table>
+      <tr><th></th><th>스크럼</th><th>XP</th></tr>
+      <tr><td>초점</td><td>일하는 방식·관리 (회의, 역할, 주기)</td><td>개발 기술 자체 (코딩·테스트 방법)</td></tr>
+      <tr><td>주기 이름</td><td>스프린트 (1~4주)</td><td>릴리즈를 짧게 반복</td></tr>
+      <tr><td>키워드</td><td>백로그, 스프린트, 회고</td><td>짝 프로그래밍, TDD, 리팩토링</td></tr>
+    </table>
+    <div class="easy"><b>구분 요령</b> — 회의·역할 이야기가 나오면 스크럼, 코딩 방법 이야기가 나오면 XP라고 기억하세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 스크럼에서 요구사항 목록(백로그)의 우선순위를 정하는 사람은?",
+  o:["스크럼 마스터","제품 책임자(PO)","개발팀","고객"],
+  a:1, e:"'무엇을 만들지'와 우선순위는 제품 책임자(PO)의 몫입니다."},
+ {q:"2. 스크럼 마스터의 역할로 옳은 것은?",
+  o:["팀원에게 업무를 지시하고 통제한다","팀의 방해 요소를 제거하고 돕는다","코드를 가장 많이 작성한다","제품 가격을 결정한다"],
+  a:1, e:"스크럼 마스터는 관리자가 아니라 팀을 돕는 도우미예요."},
+ {q:"3. 스크럼에서 1~4주 동안 집중해서 개발하는 기간을 부르는 말은?",
+  o:["백로그","스프린트","마일스톤","릴리즈"],
+  a:1, e:"스프린트 = 전력 질주. 스크럼의 핵심 개발 주기입니다."},
+ {q:"4. 매일 짧게(15분 정도) 서서 진행 상황을 공유하는 회의는?",
+  o:["스프린트 회고","일일 스크럼 회의","검토 회의","계획 회의"],
+  a:1, e:"일일 스크럼(데일리 스크럼)은 매일 하는 15분 내외의 짧은 회의예요."},
+ {q:"5. 남은 작업량이 시간에 따라 줄어드는 것을 보여주는 그래프는?",
+  o:["번다운 차트","파이 차트","간트 차트","히스토그램"],
+  a:0, e:"burn down = 타서 없어지다. 남은 일이 줄어드는 모습을 보여줍니다."},
+ {q:"6. 두 명이 한 컴퓨터에서 함께 코딩하는 XP 실천 기법은?",
+  o:["리팩토링","짝 프로그래밍","지속적 통합","소규모 릴리즈"],
+  a:1, e:"짝(pair) 프로그래밍 — 한 명은 작성, 한 명은 검토합니다."},
+ {q:"7. 코드를 작성하기 전에 테스트를 먼저 만드는 개발 방법은?",
+  o:["TDD(테스트 주도 개발)","DDD","RAD","CBD"],
+  a:0, e:"Test-Driven Development — 테스트가 개발을 이끈다는 뜻이에요."},
+ {q:"8. 리팩토링에 대한 설명으로 옳은 것은?",
+  o:["새로운 기능을 추가하는 것","기능은 유지하고 코드 내부 구조만 개선하는 것","프로그램을 삭제하는 것","테스트를 생략하는 것"],
+  a:1, e:"겉(기능)은 그대로, 속(코드)만 깔끔하게! 이게 리팩토링입니다."},
+ {q:"9. 여러 사람의 코드를 자주 합쳐 문제를 일찍 발견하는 XP 기법은?",
+  o:["공동 코드 소유","지속적 통합(CI)","번다운 차트","스프린트"],
+  a:1, e:"Continuous Integration — 자주 합칠수록 충돌을 빨리 찾아요."},
+ {q:"10. 스크럼과 XP의 차이로 가장 알맞은 것은?",
+  o:["스크럼은 코딩 기법, XP는 회의 방식에 초점","스크럼은 일하는 방식·관리, XP는 개발 기술에 초점","둘 다 폭포수 모형의 한 종류다","XP는 문서 작성을 가장 중시한다"],
+  a:1, e:"회의·역할 = 스크럼, 코딩 방법(TDD·짝 프로그래밍) = XP."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 · 현행 시스템 파악하기</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 4 · 1과목 소프트웨어 설계</span>
+    <h1>현행 시스템 파악하기</h1>
+    <p>2026-07-07 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제의 핵심은 <b>V모형</b> — 폭포수를 V자로 접어 개발 단계마다 테스트 짝을 붙인 모형이었죠. 요구사항 분석↔인수 테스트, 코딩↔단위 테스트. 오늘은 새 시스템을 만들기 전에 <b>지금 쓰고 있는 시스템(현행 시스템)을 조사하는 방법</b>을 배워요.</p>
+  </section>
+
+  <section>
+    <h2>1. 왜 현행 시스템을 파악할까?</h2>
+    <p>새 소프트웨어는 보통 기존 시스템을 대체하거나 연결돼요. 그래서 개발 전에 <b>"지금은 뭘, 어떻게 쓰고 있지?"</b>를 정확히 조사해야 새 시스템의 개발 범위와 방향을 정할 수 있어요.</p>
+    <div class="easy"><b>비유</b> — 주방 리모델링 전에 지금 주방의 크기, 수도·가스 배관 위치, 쓰던 가전을 먼저 확인하는 것과 같아요. 안 그러면 새 싱크대가 배관과 안 맞겠죠.</div>
+  </section>
+
+  <section>
+    <h2>2. 파악 순서 3단계</h2>
+    <table>
+      <tr><th>단계</th><th>조사 내용</th></tr>
+      <tr><td><b>1단계</b></td><td>시스템 <b>구성</b>(어떤 시스템들이 있나) / <b>기능</b>(각각 뭘 하나) / <b>인터페이스</b>(서로 어떻게 연결되나)</td></tr>
+      <tr><td><b>2단계</b></td><td><b>아키텍처</b>(전체 구조도) / <b>소프트웨어</b>(설치된 프로그램, 라이선스)</td></tr>
+      <tr><td><b>3단계</b></td><td><b>하드웨어</b>(서버 사양) / <b>네트워크</b>(연결 구성도)</td></tr>
+    </table>
+    <div class="easy"><b>외우는 법</b> — 위에서 아래로 내려간다고 생각하세요. ① 겉으로 보이는 기능 → ② 소프트웨어 → ③ 기계(하드웨어)와 선(네트워크). "구기인 → 아소 → 하네"</div>
+    <div class="point"><b>시험 포인트</b> — "몇 단계에서 무엇을 파악하는가"를 묻습니다. 특히 인터페이스는 1단계, 네트워크는 3단계!</div>
+  </section>
+
+  <section>
+    <h2>3. 인터페이스 파악 시 확인할 것</h2>
+    <p>인터페이스(interface)는 <b>시스템끼리 데이터를 주고받는 접점</b>이에요. 조사할 항목:</p>
+    <p>① <b>데이터 형식</b> — XML, JSON 등 (둘 다 데이터를 문자로 표현하는 약속된 양식)<br>
+    ② <b>전송 방식(프로토콜)</b> — TCP/IP, HTTP 등 통신 규칙<br>
+    ③ <b>주기</b> — 실시간으로 보내나, 하루 한 번 모아서 보내나(배치)</p>
+    <div class="easy"><b>비유</b> — 회사끼리 서류를 주고받을 때 "어떤 양식으로(형식), 어떤 방법으로(우편/이메일=프로토콜), 얼마나 자주(주기)" 보내는지 정하는 것과 같아요.</div>
+  </section>
+
+  <section>
+    <h2>4. 소프트웨어 아키텍처란?</h2>
+    <p>아키텍처(architecture)는 원래 '건축'이라는 뜻이에요. 소프트웨어 아키텍처는 <b>시스템 전체의 뼈대 설계도</b> — 어떤 부품(구성 요소)들이 있고, 서로 어떻게 연결되는지를 큰 그림으로 그린 거예요.</p>
+    <div class="easy"><b>비유</b> — 아파트의 골조 도면이에요. 벽지 색(세부 코드)이 아니라 기둥과 층 구조(전체 구조)를 보여주죠.</div>
+    <div class="point"><b>시험 포인트</b> — 아키텍처 = "시스템의 전체 구조", 세부 코드가 아니라 큰 그림이라는 점을 기억하세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 새 시스템 개발 전에 현행 시스템을 파악하는 가장 큰 이유는?",
+  o:["개발자를 뽑기 위해","새 시스템의 개발 범위와 방향을 정하기 위해","기존 시스템을 칭찬하기 위해","비용을 늘리기 위해"],
+  a:1, e:"지금 상태를 알아야 무엇을 새로 만들지 정할 수 있어요."},
+ {q:"2. 현행 시스템 파악 1단계에서 조사하는 것은?",
+  o:["하드웨어와 네트워크","시스템 구성·기능·인터페이스","아키텍처와 소프트웨어","개발자 명단"],
+  a:1, e:"1단계 = 구성·기능·인터페이스. '구기인'으로 외우세요."},
+ {q:"3. 현행 시스템 파악 3단계에서 조사하는 것은?",
+  o:["시스템 기능","인터페이스","하드웨어와 네트워크","요구사항 명세서"],
+  a:2, e:"3단계 = 기계(하드웨어)와 선(네트워크)."},
+ {q:"4. 시스템끼리 데이터를 주고받는 접점을 부르는 말은?",
+  o:["인터페이스","아키텍처","백로그","프로토타입"],
+  a:0, e:"inter(서로) + face(맞대다) = 서로 맞닿는 접점이에요."},
+ {q:"5. 인터페이스 파악 시 확인 항목이 아닌 것은?",
+  o:["데이터 형식(XML·JSON)","전송 방식(프로토콜)","주기(실시간/배치)","개발자의 취미"],
+  a:3, e:"형식·방식·주기 3가지를 확인합니다."},
+ {q:"6. XML과 JSON은 무엇인가요?",
+  o:["데이터를 표현하는 형식","컴퓨터 브랜드","개발 방법론","테스트 종류"],
+  a:0, e:"둘 다 데이터를 문자로 주고받기 위한 약속된 양식이에요."},
+ {q:"7. 데이터를 모았다가 정해진 시간에 한꺼번에 처리하는 방식은?",
+  o:["실시간 처리","배치(일괄) 처리","랜덤 처리","수동 처리"],
+  a:1, e:"batch = 한 묶음. 모아서 한 번에 처리하는 방식입니다."},
+ {q:"8. 소프트웨어 아키텍처에 대한 설명으로 옳은 것은?",
+  o:["코드 한 줄 한 줄의 세부 내용","시스템 전체의 구조와 구성 요소 간 관계","소프트웨어의 가격표","테스트 결과 보고서"],
+  a:1, e:"아키텍처는 건물의 골조 도면처럼 전체 뼈대를 보여줘요."},
+ {q:"9. 통신 규칙(예: TCP/IP, HTTP)을 부르는 말은?",
+  o:["프로토콜","아키텍처","알고리즘","데이터베이스"],
+  a:0, e:"프로토콜 = 통신할 때 지키기로 한 약속(규칙)입니다."},
+ {q:"10. 스크럼에서 매일 15분씩 하는 회의는? (복습!)",
+  o:["스프린트 회고","일일 스크럼 회의","인수 테스트","계획 회의"],
+  a:1, e:"Day 2 복습! 매일 짧게 = 일일 스크럼(데일리 스크럼)."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

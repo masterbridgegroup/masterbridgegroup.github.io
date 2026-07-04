@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7 · 1주차 총복습 + 종합 테스트</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 7 · 1과목 소프트웨어 설계 · 주간 복습</span>
+    <h1>1주차 총복습 + 종합 테스트</h1>
+    <p>2026-07-10 · 핵심 요약 + 종합 테스트 15문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>이번 주 핵심 한 장 요약</h2>
+    <table>
+      <tr><th>Day</th><th>꼭 기억할 것</th></tr>
+      <tr><td><b>1</b></td><td>생명주기 "요설구테유" / 폭포수=순차·못 돌아감 / 나선형=위험 분석 반복 / 프로토타입=시제품 먼저 / 애자일 4가치</td></tr>
+      <tr><td><b>2</b></td><td>스크럼: PO(우선순위)·SM(도우미)·개발팀, 스프린트 1~4주, 번다운 차트 / XP: 짝 프로그래밍·TDD·리팩토링·CI</td></tr>
+      <tr><td><b>3</b></td><td>V모형=단계별 테스트 짝(요구분석↔인수, 코딩↔단위) / RAD=도구 활용 60~90일 / 증분형=조금씩 추가</td></tr>
+      <tr><td><b>4</b></td><td>현행 시스템 3단계: 구기인 → 아소 → 하네 / 인터페이스 확인: 형식·프로토콜·주기 / 아키텍처=전체 뼈대</td></tr>
+      <tr><td><b>5</b></td><td>OS 기준 "신성기주구" / DBMS는 가용성·상호 호환성 / WAS=동적 처리(Tomcat·JEUS) / GPL=소스 공개 의무</td></tr>
+      <tr><td><b>6</b></td><td>기능적="무엇을" vs 비기능적="얼마나 잘"(성능·보안·품질) / 요구사항 개발 "도분명확"</td></tr>
+    </table>
+    <div class="point"><b>공부법</b> — 이 표를 먼저 훑고 테스트를 푸세요. 틀린 문제는 해당 Day로 돌아가 그 부분만 다시 읽으면 돼요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>주간 종합 테스트 (15문제)</h2>
+    <p style="font-size:13px;color:#777;">시험처럼 풀어보세요. 12개 이상 맞으면 아주 훌륭해요!</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어 생명주기 5단계의 올바른 순서는?",
+  o:["요구사항 분석 → 설계 → 구현 → 테스트 → 유지보수","설계 → 구현 → 요구사항 분석 → 테스트 → 유지보수","요구사항 분석 → 구현 → 설계 → 테스트 → 유지보수","구현 → 테스트 → 설계 → 요구사항 분석 → 유지보수"],
+  a:0, e:"요설구테유!"},
+ {q:"2. 각 단계를 완전히 마쳐야 다음으로 넘어가는 고전적 모형은?",
+  o:["애자일","폭포수 모형","증분형 모형","RAD"],
+  a:1, e:"폭포수는 아래로만 흐릅니다."},
+ {q:"3. 나선형 모형의 4단계 순서로 옳은 것은?",
+  o:["계획 → 위험 분석 → 개발 → 고객 평가","위험 분석 → 계획 → 개발 → 고객 평가","계획 → 개발 → 위험 분석 → 고객 평가","고객 평가 → 계획 → 위험 분석 → 개발"],
+  a:0, e:"계획 다음이 위험 분석! 나선형의 상징이에요."},
+ {q:"4. 애자일 선언에서 '방대한 문서'보다 더 가치 있게 여기는 것은?",
+  o:["계약 협상","작동하는 소프트웨어","공정과 도구","계획 준수"],
+  a:1, e:"문서보다 실제로 돌아가는 소프트웨어!"},
+ {q:"5. 스크럼에서 제품 백로그의 우선순위를 정하는 사람은?",
+  o:["스크럼 마스터","개발팀","제품 책임자(PO)","테스터"],
+  a:2, e:"무엇을 먼저 만들지는 PO가 정해요."},
+ {q:"6. 코드 작성 전에 테스트부터 만드는 XP 기법은?",
+  o:["리팩토링","TDD","짝 프로그래밍","공동 코드 소유"],
+  a:1, e:"Test-Driven Development — 테스트가 먼저!"},
+ {q:"7. 기능은 그대로 두고 코드 내부 구조만 개선하는 것은?",
+  o:["리팩토링","디버깅","컴파일","릴리즈"],
+  a:0, e:"겉은 그대로, 속만 깔끔하게 = 리팩토링."},
+ {q:"8. V모형에서 '요구사항 분석'과 짝을 이루는 테스트는?",
+  o:["단위 테스트","통합 테스트","인수 테스트","스모크 테스트"],
+  a:2, e:"고객이 요구대로 됐는지 최종 확인 = 인수 테스트."},
+ {q:"9. 자동화 도구를 활용해 60~90일 내에 개발하는 모형은?",
+  o:["V모형","나선형","RAD","폭포수"],
+  a:2, e:"Rapid = 빠른. 60~90일이 시그니처 키워드."},
+ {q:"10. 현행 시스템 파악 1단계에서 조사하는 것은?",
+  o:["하드웨어·네트워크","구성·기능·인터페이스","아키텍처·소프트웨어","예산·인력"],
+  a:1, e:"구기인(1) → 아소(2) → 하네(3)."},
+ {q:"11. 시스템 간 데이터 교환 시 확인할 항목이 아닌 것은?",
+  o:["데이터 형식","통신 프로토콜","전송 주기","개발자 연봉"],
+  a:3, e:"형식·프로토콜·주기 3가지입니다."},
+ {q:"12. DBMS 선정 기준 중 '장애 없이 계속 사용 가능한 정도'는?",
+  o:["가용성","호환성","이식성","무결성"],
+  a:0, e:"available = 늘 사용 가능함 = 가용성."},
+ {q:"13. 웹에서 동적인 요청(로그인·주문)을 처리하는 서버는?",
+  o:["웹 서버","WAS","DNS 서버","프록시 서버"],
+  a:1, e:"동적 = WAS(Tomcat, JEUS 등)."},
+ {q:"14. '시스템은 초당 1000건의 거래를 처리해야 한다'는 어떤 요구사항?",
+  o:["기능적 요구사항","비기능적 요구사항","사용자 요구사항","설계 요구사항"],
+  a:1, e:"숫자·성능이 나오면 비기능적!"},
+ {q:"15. 요구사항 개발 4단계의 올바른 순서는?",
+  o:["도출 → 분석 → 명세 → 확인","분석 → 도출 → 확인 → 명세","명세 → 분석 → 도출 → 확인","도출 → 명세 → 분석 → 확인"],
+  a:0, e:"도분명확! 다음 주에 단계별로 깊이 배워요."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='주간 테스트 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=12?'1주차 완벽 통과! 다음 주가 기대돼요 🎉':correct>=9?'좋아요! 틀린 Day만 다시 훑어보세요.':'요약표를 한 번 더 읽고 내일 다시 풀어보면 확 올라요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

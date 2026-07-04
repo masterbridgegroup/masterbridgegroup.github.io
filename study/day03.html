@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 · 그 밖의 개발 모형들 (V모형·RAD·반복 점증)</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 3 · 1과목 소프트웨어 설계</span>
+    <h1>그 밖의 개발 모형들 (V모형·RAD·반복 점증)</h1>
+    <p>2026-07-06 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 배운 <b>스크럼</b>은 스프린트(1~4주 전력 질주)를 반복하는 방식이었죠. 백로그(할 일 목록) → 계획 → 스프린트 → 일일 회의 → 검토 → 회고 순서, 기억나시죠? 오늘은 시험에 종종 나오는 나머지 개발 모형들을 정리하고, 지금까지 배운 모형을 전부 비교해요.</p>
+  </section>
+
+  <section>
+    <h2>1. V모형 (V-Model)</h2>
+    <p>폭포수 모형을 <b>V자 모양으로 접은</b> 모형이에요. 왼쪽 내리막은 개발 단계, 오른쪽 오르막은 테스트 단계인데, <b>개발 단계마다 짝이 되는 테스트가 하나씩</b> 있어요.</p>
+    <table>
+      <tr><th>개발 단계 (왼쪽)</th><th>↔ 짝이 되는 테스트 (오른쪽)</th></tr>
+      <tr><td>요구사항 분석</td><td>인수 테스트 (고객이 최종 확인)</td></tr>
+      <tr><td>시스템 설계</td><td>시스템 테스트</td></tr>
+      <tr><td>상세 설계</td><td>통합 테스트</td></tr>
+      <tr><td>코딩</td><td>단위 테스트</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 시험 공부할 때 단원마다 확인 문제를 푸는 것처럼, 개발의 매 단계마다 대응하는 검증이 있는 거예요.</div>
+    <div class="point"><b>시험 포인트</b> — "폭포수의 변형", "테스트(검증)를 강조한 모형" = V모형.</div>
+  </section>
+
+  <section>
+    <h2>2. RAD 모형 (빠른 개발)</h2>
+    <p>RAD(Rapid Application Development)는 이름 그대로 <b>빨리 만드는</b> 게 목표예요. 자동화 도구(코드를 대신 만들어주는 프로그램)와 이미 만들어진 부품을 재사용해서 <b>짧은 기간(보통 60~90일)</b> 안에 완성해요.</p>
+    <div class="easy"><b>비유</b> — 조립식 가구예요. 나무를 직접 자르지 않고 미리 가공된 부품을 조립하니 빠르죠. 대신 아주 특수한 맞춤 가구(기술적으로 복잡한 시스템)에는 안 맞아요.</div>
+    <div class="point"><b>시험 포인트</b> — "도구 활용", "60~90일", "빠른 개발" = RAD. 단, 기술적 위험이 크거나 대규모인 프로젝트에는 부적합해요.</div>
+  </section>
+
+  <section>
+    <h2>3. 반복 점증적 모형</h2>
+    <p>소프트웨어를 한 번에 다 만들지 않고, <b>핵심 기능부터 만들어 내놓고 조금씩 살을 붙여가는</b> 방식이에요. 증분(增分, 늘어난 부분)을 하나씩 더해간다고 해서 '증분형'이라고도 불러요.</p>
+    <div class="easy"><b>비유</b> — 게임 회사가 기본 게임을 먼저 출시하고, 업데이트로 새 기능을 계속 추가하는 것과 같아요.</div>
+    <p>애자일·나선형도 크게 보면 이 '반복' 계열에 속해요. 반대로 폭포수·V모형은 '한 번에 쭉' 계열이죠.</p>
+  </section>
+
+  <section>
+    <h2>4. 모형 총정리 비교표</h2>
+    <table>
+      <tr><th>모형</th><th>핵심 키워드</th><th>어울리는 상황</th></tr>
+      <tr><td>폭포수</td><td>순차 진행, 못 되돌아감</td><td>요구사항이 처음부터 명확할 때</td></tr>
+      <tr><td>프로토타입</td><td>시제품 먼저</td><td>고객이 원하는 게 불분명할 때</td></tr>
+      <tr><td>나선형</td><td>위험 분석 반복</td><td>실패 위험이 큰 대형 프로젝트</td></tr>
+      <tr><td>V모형</td><td>단계별 테스트 짝</td><td>신뢰성(검증)이 중요할 때</td></tr>
+      <tr><td>RAD</td><td>도구 활용, 60~90일</td><td>빨리 만들어야 할 때</td></tr>
+      <tr><td>애자일</td><td>짧은 반복, 변화 대응</td><td>요구사항이 자주 바뀔 때</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 이 표 한 장이 모형 문제의 80%를 해결해요. 키워드 → 모형 매칭을 반복해서 외우세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 폭포수 모형을 변형하여 개발 단계마다 대응하는 테스트 단계를 둔 모형은?",
+  o:["나선형 모형","V모형","RAD","프로토타입 모형"],
+  a:1, e:"V자의 왼쪽은 개발, 오른쪽은 테스트 — 단계마다 짝이 있어요."},
+ {q:"2. V모형에서 '요구사항 분석'과 짝이 되는 테스트는?",
+  o:["단위 테스트","통합 테스트","시스템 테스트","인수 테스트"],
+  a:3, e:"요구사항대로 됐는지 고객이 최종 확인하는 것이 인수 테스트입니다."},
+ {q:"3. V모형에서 '코딩' 단계와 짝이 되는 테스트는?",
+  o:["단위 테스트","인수 테스트","시스템 테스트","알파 테스트"],
+  a:0, e:"코딩한 작은 조각(단위)을 바로 검사하는 게 단위 테스트예요."},
+ {q:"4. 자동화 도구와 부품 재사용으로 60~90일 내 빠르게 개발하는 모형은?",
+  o:["폭포수 모형","V모형","RAD","나선형 모형"],
+  a:2, e:"RAD = Rapid(빠른) Application Development. 60~90일이 힌트!"},
+ {q:"5. RAD 모형이 적합하지 않은 경우는?",
+  o:["기술적 위험이 크고 규모가 큰 프로젝트","기간이 짧은 프로젝트","도구를 활용할 수 있는 프로젝트","요구사항이 단순한 프로젝트"],
+  a:0, e:"RAD는 조립식이라 크고 복잡하며 위험한 프로젝트에는 부적합해요."},
+ {q:"6. 핵심 기능부터 만들어 배포하고 기능을 조금씩 추가해가는 방식은?",
+  o:["반복 점증적(증분형) 모형","폭포수 모형","V모형","빅뱅 방식"],
+  a:0, e:"증분(늘어난 부분)을 하나씩 더해가는 방식입니다. 게임 업데이트를 떠올리세요."},
+ {q:"7. 요구사항이 처음부터 명확하게 정해져 있을 때 가장 어울리는 모형은?",
+  o:["애자일","폭포수 모형","프로토타입 모형","나선형 모형"],
+  a:1, e:"바뀔 게 없다면 순서대로 착착 진행하는 폭포수가 효율적이에요."},
+ {q:"8. 요구사항이 자주 바뀌는 프로젝트에 가장 어울리는 방식은?",
+  o:["폭포수 모형","V모형","애자일","RAD"],
+  a:2, e:"애자일의 존재 이유가 '변화에 대응'입니다."},
+ {q:"9. '위험 분석'을 반복 수행하는 모형은? (복습!)",
+  o:["나선형 모형","V모형","폭포수 모형","RAD"],
+  a:0, e:"위험 분석 = 나선형. Day 1 복습 문제였어요!"},
+ {q:"10. 신뢰성 검증이 특히 중요한 시스템(예: 의료기기)에 어울리는 모형은?",
+  o:["RAD","V모형","프로토타입 모형","빅뱅 방식"],
+  a:1, e:"V모형은 모든 단계에 검증이 붙어 있어 신뢰성이 중요한 곳에 적합해요."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>
