@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 · 소프트웨어 생명주기와 개발 방법론</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 1 · 1과목 소프트웨어 설계</span>
+    <h1>소프트웨어 생명주기와 개발 방법론</h1>
+    <p>2026-07-04 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>1. 소프트웨어 생명주기(SDLC)란?</h2>
+    <p>소프트웨어도 사람처럼 <b>태어나서 자라고, 쓰이다가, 은퇴하는 과정</b>이 있어요. 이 전체 과정을 <b>소프트웨어 생명주기</b>(Software Development Life Cycle)라고 합니다.</p>
+    <div class="easy"><b>쉽게 말하면</b> — 집 짓기와 같아요. ① 어떤 집이 필요한지 듣고(요구사항 분석) → ② 설계도를 그리고(설계) → ③ 짓고(구현) → ④ 문제없는지 점검하고(테스트) → ⑤ 살면서 고쳐 쓰는(유지보수) 순서죠.</div>
+    <p>순서: <b>요구사항 분석 → 설계 → 구현 → 테스트 → 유지보수</b></p>
+    <div class="point"><b>시험 포인트</b> — 이 5단계 순서를 묻는 문제가 자주 나와요. "요설구테유"로 외우세요.</div>
+  </section>
+
+  <section>
+    <h2>2. 폭포수 모형 (Waterfall)</h2>
+    <p>폭포의 물이 아래로만 떨어지듯, <b>한 단계를 완전히 끝내야 다음 단계로</b> 넘어가는 가장 오래된 고전적 방식이에요.</p>
+    <div class="easy"><b>비유</b> — 시멘트가 굳은 뒤에는 벽 위치를 못 바꾸는 것처럼, 앞 단계로 <b>되돌아가기 어렵다</b>는 게 최대 단점이에요.</div>
+    <p>장점: 단계가 명확해서 관리가 쉬움 / 단점: 중간에 요구사항이 바뀌면 대응이 힘듦, 결과물은 마지막에나 볼 수 있음</p>
+    <div class="point"><b>시험 포인트</b> — "가장 오래된 모형", "단계별 순차 진행", "되돌아가기 어려움" = 폭포수.</div>
+  </section>
+
+  <section>
+    <h2>3. 프로토타입 모형 (Prototype)</h2>
+    <p>프로토타입(=시제품, 견본)을 <b>먼저 대충 만들어 고객에게 보여주고</b>, 피드백을 받아 진짜를 만드는 방식이에요.</p>
+    <div class="easy"><b>비유</b> — 옷을 맞추기 전에 가봉(임시로 시침질한 옷)을 입어보는 것과 같아요. 고객이 "아, 이런 느낌이구나"를 미리 확인할 수 있죠.</div>
+    <p>장점: 고객 요구를 정확히 파악 / 단점: 시제품을 진짜 최종품으로 오해할 수 있음</p>
+  </section>
+
+  <section>
+    <h2>4. 나선형 모형 (Spiral)</h2>
+    <p>달팽이 껍질처럼 <b>빙글빙글 돌면서 점점 완성</b>해 가는 방식이에요. 한 바퀴 돌 때마다 4단계를 반복합니다.</p>
+    <p><b>계획 → 위험 분석 → 개발 → 고객 평가</b> (반복)</p>
+    <div class="easy"><b>핵심 단어는 "위험 분석"</b> — 나선형만의 특징이에요. 큰 프로젝트처럼 실패 위험이 큰 경우에 적합해요.</div>
+    <div class="point"><b>시험 포인트</b> — "위험 분석"이 보이면 무조건 나선형! 4단계 순서도 자주 출제돼요.</div>
+  </section>
+
+  <section>
+    <h2>5. 애자일 (Agile)</h2>
+    <p>애자일은 '날렵한, 민첩한'이라는 뜻이에요. <b>짧은 주기(보통 1~4주)로 조금씩 만들어 자주 보여주고, 변화에 유연하게 대응</b>하는 최신 방식입니다. 폭포수의 반대라고 생각하면 쉬워요.</p>
+    <table>
+      <tr><th>애자일이 더 중요하게 여기는 것</th><th>덜 중요하게 여기는 것</th></tr>
+      <tr><td>개인과 상호작용(소통)</td><td>공정과 도구</td></tr>
+      <tr><td>작동하는 소프트웨어</td><td>방대한 문서</td></tr>
+      <tr><td>고객과의 협력</td><td>계약 협상</td></tr>
+      <tr><td>변화에 대응</td><td>계획을 그대로 따르기</td></tr>
+    </table>
+    <p>대표 종류: <b>스크럼</b>(짧은 반복 주기 '스프린트'로 진행), <b>XP</b>(익스트림 프로그래밍 — 5가지 가치: 용기·단순성·의사소통·피드백·존중)</p>
+    <div class="point"><b>시험 포인트</b> — 위 표의 4가지 가치 비교, 그리고 XP의 5가지 가치가 단골 문제예요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어 생명주기의 단계를 올바른 순서로 나열한 것은?",
+  o:["설계 → 요구사항 분석 → 구현 → 테스트 → 유지보수","요구사항 분석 → 설계 → 구현 → 테스트 → 유지보수","구현 → 설계 → 요구사항 분석 → 유지보수 → 테스트","요구사항 분석 → 구현 → 설계 → 테스트 → 유지보수"],
+  a:1, e:"'요설구테유' — 요구사항 분석이 항상 첫 단계, 유지보수가 마지막입니다."},
+ {q:"2. 한 단계가 완전히 끝나야 다음 단계로 넘어가며, 앞 단계로 되돌아가기 어려운 고전적 모형은?",
+  o:["나선형 모형","프로토타입 모형","폭포수 모형","애자일"],
+  a:2, e:"폭포의 물이 아래로만 흐르듯 순서대로만 진행 = 폭포수 모형."},
+ {q:"3. 폭포수 모형의 단점으로 가장 알맞은 것은?",
+  o:["단계가 불명확해 관리가 어렵다","중간에 요구사항이 바뀌면 대응하기 어렵다","고객 피드백을 너무 자주 받는다","위험 분석을 반복해서 시간이 오래 걸린다"],
+  a:1, e:"앞 단계로 돌아가기 어려워서 요구사항 변경에 약합니다."},
+ {q:"4. 시제품을 먼저 만들어 고객에게 보여주고 피드백을 받는 모형은?",
+  o:["프로토타입 모형","폭포수 모형","나선형 모형","V 모형"],
+  a:0, e:"프로토타입 = 시제품(견본). 옷 가봉처럼 미리 보여주는 방식이에요."},
+ {q:"5. 나선형 모형에서 반복되는 4단계의 올바른 순서는?",
+  o:["계획 → 개발 → 위험 분석 → 고객 평가","위험 분석 → 계획 → 고객 평가 → 개발","계획 → 위험 분석 → 개발 → 고객 평가","개발 → 계획 → 위험 분석 → 고객 평가"],
+  a:2, e:"계획 → 위험 분석 → 개발 → 고객 평가. '위험 분석'이 계획 바로 다음!"},
+ {q:"6. 다른 모형에는 없는, 나선형 모형만의 대표적인 특징은?",
+  o:["문서를 만들지 않는다","위험 분석 단계가 있다","테스트를 생략한다","한 번만 개발하고 끝낸다"],
+  a:1, e:"'위험 분석'이 보이면 무조건 나선형입니다."},
+ {q:"7. 애자일 선언에서 더 가치 있게 여기는 것이 아닌 것은?",
+  o:["개인과 상호작용","작동하는 소프트웨어","방대한 문서","변화에 대응"],
+  a:2, e:"애자일은 방대한 문서보다 '작동하는 소프트웨어'를 중시합니다."},
+ {q:"8. 짧은 반복 주기인 '스프린트' 단위로 개발을 진행하는 애자일 방법은?",
+  o:["XP","스크럼","폭포수","나선형"],
+  a:1, e:"스크럼의 핵심 용어가 스프린트(1~4주의 짧은 개발 주기)입니다."},
+ {q:"9. XP(익스트림 프로그래밍)의 5가지 가치가 아닌 것은?",
+  o:["용기","단순성","의사소통","경쟁"],
+  a:3, e:"XP 5가지 가치: 용기·단순성·의사소통·피드백·존중. 경쟁은 없어요."},
+ {q:"10. 실패 위험이 큰 대규모 프로젝트에 가장 적합한 모형은?",
+  o:["폭포수 모형","프로토타입 모형","나선형 모형","단순 코딩"],
+  a:2, e:"나선형은 매 바퀴마다 위험을 분석하므로 큰 프로젝트에 적합합니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

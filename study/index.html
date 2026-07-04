@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정보처리기사 스터디 | 이대표</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--line:#e5e7f0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.6;}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 18px 60px;}
+  header{text-align:center;padding:28px 0 20px;}
+  header .badge{display:inline-block;background:var(--ink);color:#fff;font-size:12px;letter-spacing:2px;padding:5px 14px;border-radius:20px;}
+  header h1{font-size:26px;margin-top:12px;font-weight:800;}
+  header p{color:#666;font-size:14px;margin-top:4px;}
+  .dday{background:var(--ink);color:#fff;border-radius:16px;padding:20px;text-align:center;margin:18px 0;}
+  .dday .num{font-size:34px;font-weight:800;color:#8ecae6;}
+  .dday small{display:block;color:#aab;font-size:12px;margin-top:6px;}
+  .progress-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  .progress-card h2{font-size:15px;margin-bottom:10px;}
+  .bar{background:var(--soft);border-radius:10px;height:14px;overflow:hidden;}
+  .bar i{display:block;height:100%;background:var(--accent);border-radius:10px;transition:width .5s;}
+  .bar-label{font-size:13px;color:#666;margin-top:8px;}
+  .subject{font-size:13px;color:var(--accent);font-weight:700;}
+  ul.days{list-style:none;}
+  ul.days li{margin-bottom:10px;}
+  ul.days a{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:var(--ink);}
+  ul.days a:active{background:var(--soft);}
+  .daynum{background:var(--soft);color:var(--accent);font-weight:800;border-radius:10px;min-width:52px;text-align:center;padding:8px 0;font-size:14px;}
+  .meta{flex:1;}
+  .meta .t{font-weight:700;font-size:15px;}
+  .meta .d{font-size:12px;color:#888;}
+  footer{text-align:center;font-size:12px;color:#aaa;margin-top:40px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="badge">정보처리기사 필기</span>
+    <h1>이대표의 합격 노트</h1>
+    <p>매일 1시간 · 개념 학습 + 퀴즈 10문제</p>
+  </header>
+
+  <div class="dday">
+    <div class="num" id="dday">D-?</div>
+    2027년 1월 필기 시험까지
+    <small>※ 정확한 시험일은 발표 후 업데이트 (현재 2027-01-15 기준 가정)</small>
+  </div>
+
+  <div class="progress-card">
+    <h2>전체 진행률 <span class="subject" id="curSubject"></span></h2>
+    <div class="bar"><i id="barFill" style="width:0%"></i></div>
+    <div class="bar-label" id="barLabel"></div>
+  </div>
+
+  <ul class="days" id="dayList"></ul>
+
+  <footer>KEDIT Study · masterbridgegroup.github.io/study</footer>
+</div>
+
+<script>
+// ===== 매일 여기에 한 줄씩 추가됩니다 (최신이 위로 오도록 자동 정렬) =====
+const days = [
+  {n:1, date:'2026-07-04', subject:'1과목 소프트웨어 설계', title:'소프트웨어 생명주기와 개발 방법론', file:'day01.html'},
+];
+// =====================================================================
+
+const TOTAL_DAYS = 195;               // 예상 총 학습일
+const EXAM_DATE  = new Date('2027-01-15'); // 시험일(가정) — 발표 후 수정
+
+// D-day
+const today = new Date(); today.setHours(0,0,0,0);
+const diff = Math.ceil((EXAM_DATE - today) / 86400000);
+document.getElementById('dday').textContent = diff >= 0 ? 'D-' + diff : '시험일 경과';
+
+// 진행률
+const done = days.length;
+const pct = Math.min(100, Math.round(done / TOTAL_DAYS * 100));
+document.getElementById('barFill').style.width = pct + '%';
+document.getElementById('barLabel').textContent = done + '일차 완료 · 전체의 약 ' + pct + '%';
+document.getElementById('curSubject').textContent = '— ' + days[days.length-1].subject;
+
+// 목록 (최신 Day가 맨 위)
+const list = document.getElementById('dayList');
+[...days].sort((a,b)=>b.n-a.n).forEach(d=>{
+  const li = document.createElement('li');
+  li.innerHTML = '<a href="'+d.file+'"><span class="daynum">Day '+d.n+'</span>'+
+    '<span class="meta"><span class="t">'+d.title+'</span><br>'+
+    '<span class="d">'+d.date+' · '+d.subject+'</span></span></a>';
+  list.appendChild(li);
+});
+</script>
+</body>
+</html>
