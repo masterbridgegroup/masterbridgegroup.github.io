@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 · 요구사항 확인과 검토 기법</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 11 · 1과목 소프트웨어 설계</span>
+    <h1>요구사항 확인과 검토 기법</h1>
+    <p>2026-07-14 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제의 핵심은 <b>정형 명세</b> — 수학 기호로 적어 모호함을 없앤 방식이고, 대표 기법이 <b>Z·VDM·페트리넷</b>이었죠. 좋은 명세의 조건 중 '검증 가능성'도 기억나시죠? 오늘은 마지막 4단계 <b>확인</b> — 명세서가 제대로 됐는지 점검하는 방법이에요. 이걸로 "도분명확"이 완성됩니다!</p>
+  </section>
+
+  <section>
+    <h2>1. 요구사항 확인(검증)이란?</h2>
+    <p>명세서를 만들었다고 끝이 아니에요. <b>"이 문서가 고객이 진짜 원하는 걸 담았나? 빠지거나 모순된 건 없나?"</b>를 점검하는 게 확인 단계예요. 개발이 시작된 뒤 요구사항 오류를 고치려면 <b>비용이 수십 배</b>로 커지기 때문에, 이 단계가 정말 중요해요.</p>
+    <div class="easy"><b>비유</b> — 집 짓기 시작 전 설계도 최종 점검이에요. 벽을 다 세운 뒤 "화장실 위치가 틀렸네요"라고 하면 부수고 다시 지어야 하잖아요.</div>
+  </section>
+
+  <section>
+    <h2>2. 검토 기법 3형제 ⭐</h2>
+    <p>사람이 모여 문서를 검토하는 방법 3가지 — 형식(격식)이 얼마나 갖춰졌는지가 달라요.</p>
+    <table>
+      <tr><th>기법</th><th>방식</th><th>격식</th></tr>
+      <tr><td><b>동료 검토</b></td><td><b>작성자가 직접 설명</b>하고 동료 2~3명이 들으며 결함 발견</td><td>가벼움</td></tr>
+      <tr><td><b>워크스루</b></td><td>회의 <b>전에 자료를 미리 배포</b>해 검토하고, 짧은 회의로 결함 발견</td><td>중간</td></tr>
+      <tr><td><b>인스펙션</b></td><td><b>작성자가 아닌 전문가팀</b>이 정해진 절차에 따라 공식적으로 검토</td><td>엄격</td></tr>
+    </table>
+    <div class="easy"><b>구분 요령</b> — 작성자가 설명하면 동료 검토, "미리 배포"가 나오면 워크스루, "전문가·공식 절차"가 나오면 인스펙션!</div>
+    <div class="point"><b>시험 포인트</b> — 이 3가지 구분이 1과목 최다 출제 포인트 중 하나예요. 키워드 매칭을 확실히!</div>
+  </section>
+
+  <section>
+    <h2>3. 그 밖의 확인 방법</h2>
+    <p>① <b>프로토타이핑</b> — 시제품을 만들어 고객에게 보여주고 "이게 원하시던 거 맞나요?" 확인<br>
+    ② <b>테스트 설계</b> — 각 요구사항으로 테스트 케이스(시험 문제)를 미리 만들어봄. 테스트를 만들 수 없다면 그 요구사항은 애매하다는 증거!<br>
+    ③ <b>CASE 도구 활용</b> — 자동으로 일관성 검사</p>
+    <div class="easy"><b>연결고리</b> — 어제 배운 '검증 가능성'과 통해요. "검색은 2초 이내" → 테스트 만들기 쉬움 = 좋은 요구사항.</div>
+  </section>
+
+  <section>
+    <h2>4. 베이스라인과 형상 관리 맛보기</h2>
+    <p>확인까지 통과한 요구사항 명세서는 <b>베이스라인</b>(기준선)으로 정해요. 이제부터는 마음대로 못 바꾸고, <b>공식 절차(변경 요청 → 승인)</b>를 거쳐야 수정할 수 있어요. 이렇게 문서·코드의 변경을 관리하는 활동을 <b>형상 관리</b>라고 하는데, 2과목에서 자세히 배워요.</p>
+    <div class="easy"><b>비유</b> — 계약서에 도장 찍은 순간이 베이스라인이에요. 이후 내용을 바꾸려면 양쪽이 합의한 수정 계약서를 써야 하죠.</div>
+    <div class="point"><b>시험 포인트</b> — "베이스라인 이후의 변경은 공식 절차를 거친다"가 핵심 문장입니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 요구사항 개발의 마지막 단계로, 명세서가 제대로 됐는지 점검하는 것은?",
+  o:["도출","분석","명세","확인"],
+  a:3, e:"도분명확의 마지막, 확인(검증)입니다."},
+ {q:"2. 요구사항 확인이 중요한 가장 큰 이유는?",
+  o:["문서가 예뻐지므로","개발 후에 고치면 비용이 훨씬 커지므로","고객을 귀찮게 하려고","법으로 정해져 있어서"],
+  a:1, e:"늦게 발견된 요구사항 오류는 수십 배 비싸요."},
+ {q:"3. 작성자가 직접 명세서를 설명하고 동료들이 결함을 찾는 검토 기법은?",
+  o:["동료 검토","워크스루","인스펙션","브레인스토밍"],
+  a:0, e:"작성자가 설명 = 동료 검토(피어 리뷰)."},
+ {q:"4. 검토 회의 전에 자료를 미리 배포하여 검토하는 기법은?",
+  o:["동료 검토","워크스루","인스펙션","프로토타이핑"],
+  a:1, e:"'미리 배포'가 워크스루의 시그니처 키워드!"},
+ {q:"5. 작성자가 아닌 전문가팀이 공식 절차에 따라 검토하는 기법은?",
+  o:["동료 검토","워크스루","인스펙션","관찰"],
+  a:2, e:"전문가 + 공식 절차 = 인스펙션. 가장 격식 있는 검토예요."},
+ {q:"6. 세 검토 기법을 격식이 가벼운 것부터 나열하면?",
+  o:["인스펙션 → 워크스루 → 동료 검토","동료 검토 → 워크스루 → 인스펙션","워크스루 → 인스펙션 → 동료 검토","셋 다 같다"],
+  a:1, e:"동료 검토(가벼움) → 워크스루(중간) → 인스펙션(엄격)."},
+ {q:"7. 어떤 요구사항으로 테스트 케이스를 만들 수 없다면, 이는 무엇을 의미할까요?",
+  o:["요구사항이 완벽하다","요구사항이 애매하다(검증 불가)","테스터가 무능하다","시스템이 빠르다"],
+  a:1, e:"테스트를 못 만든다 = 확인할 방법이 없다 = 애매한 요구사항."},
+ {q:"8. 확인을 통과한 명세서를 공식 기준으로 정한 것을 무엇이라 할까요?",
+  o:["베이스라인","데드라인","가이드라인","온라인"],
+  a:0, e:"baseline = 기준선. 이후 변경은 공식 절차를 거쳐요."},
+ {q:"9. 베이스라인 설정 이후 요구사항을 변경하려면?",
+  o:["아무나 자유롭게 수정한다","공식 변경 절차(요청→승인)를 거친다","변경이 불가능하다","고객 몰래 바꾼다"],
+  a:1, e:"도장 찍은 계약서처럼, 합의된 절차로만 수정!"},
+ {q:"10. 정형 명세 기법에 해당하는 것은? (복습!)",
+  o:["자연어 서술","Z, VDM, 페트리넷","인터뷰","워크숍"],
+  a:1, e:"Day 10 복습! 수학 기호 = 정형 = Z·VDM·페트리넷."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 · UML 다이어그램 종류 총정리</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 13 · 1과목 소프트웨어 설계</span>
+    <h1>UML 다이어그램 종류 총정리</h1>
+    <p>2026-07-16 · 오늘 배울 개념 4개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제의 핵심은 UML 관계 6가지였죠. 특히 <b>집합(빈 마름모, 부분 독립 가능)</b> vs <b>포함(채운 마름모, 같이 소멸)</b> 구분! 그리고 다이어그램이 <b>구조(멈춘 사진)</b>와 <b>행위(움직이는 영상)</b> 두 갈래로 나뉜다고 했어요. 오늘은 그 종류를 정리합니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 구조(정적) 다이어그램 6종</h2>
+    <table>
+      <tr><th>이름</th><th>무엇을 그리나</th></tr>
+      <tr><td><b>클래스</b> ⭐</td><td>클래스(설계 틀)들의 속성·기능과 클래스 간 관계 — 가장 많이 씀</td></tr>
+      <tr><td><b>객체</b></td><td>실제 객체(실물)들의 특정 시점 모습</td></tr>
+      <tr><td><b>컴포넌트</b></td><td>소프트웨어 부품(컴포넌트) 간의 관계 — 구현 단계에서 사용</td></tr>
+      <tr><td><b>배치</b></td><td>어느 하드웨어에 무엇이 설치되는가 — 물리적 배치, 구현 단계</td></tr>
+      <tr><td><b>복합체 구조</b></td><td>복잡한 클래스의 내부 구조</td></tr>
+      <tr><td><b>패키지</b></td><td>관련 요소들을 폴더(패키지)로 묶은 모습</td></tr>
+    </table>
+    <div class="easy"><b>외우는 법</b> — "클객컴배복패" (클래스·객체·컴포넌트·배치·복합체·패키지). 6개 전부 '무엇으로 이루어졌나'를 그린 멈춘 사진이에요.</div>
+    <div class="point"><b>시험 포인트</b> — 컴포넌트·배치 다이어그램은 <b>구현 단계</b>에서 쓰인다는 것도 같이 나와요.</div>
+  </section>
+
+  <section>
+    <h2>2. 행위(동적) 다이어그램 — 유스케이스와 시퀀스 ⭐</h2>
+    <p>움직임을 그리는 다이어그램 중 시험 최다 출제 2가지:</p>
+    <p>① <b>유스케이스 다이어그램</b> — 사용자(액터) 관점에서 시스템이 제공하는 기능을 그림. Day 8에서 배운 그 유스케이스! 요구사항 분석 단계에서 사용해요.<br>
+    ② <b>시퀀스 다이어그램</b> — 객체들이 <b>시간 순서대로</b> 주고받는 메시지를 위에서 아래로 그림.</p>
+    <div class="easy"><b>비유</b> — 유스케이스는 식당 메뉴판(손님이 시킬 수 있는 것들), 시퀀스는 주문이 처리되는 타임라인(손님→종업원→주방→종업원→손님)이에요.</div>
+    <div class="point"><b>시험 포인트</b> — "시간의 흐름", "메시지 순서"가 나오면 무조건 시퀀스 다이어그램!</div>
+  </section>
+
+  <section>
+    <h2>3. 나머지 행위 다이어그램</h2>
+    <table>
+      <tr><th>이름</th><th>무엇을 그리나</th></tr>
+      <tr><td><b>활동</b></td><td>업무 처리 흐름을 순서도처럼 (조건 분기, 병렬 처리 포함)</td></tr>
+      <tr><td><b>상태</b></td><td>하나의 객체가 상태를 바꿔가는 모습 (예: 주문 → 결제됨 → 배송중 → 완료)</td></tr>
+      <tr><td><b>커뮤니케이션</b></td><td>객체들이 주고받는 메시지 + 객체 간 연관 관계까지 표현</td></tr>
+      <tr><td><b>타이밍</b></td><td>시간 제약을 명시적으로 표현</td></tr>
+    </table>
+    <div class="easy"><b>시퀀스 vs 커뮤니케이션</b> — 둘 다 메시지를 그리지만, 시퀀스는 '시간 순서'를 강조하고 커뮤니케이션은 '객체 사이의 관계망'을 강조해요.</div>
+  </section>
+
+  <section>
+    <h2>4. 헷갈림 방지 최종 정리</h2>
+    <table>
+      <tr><th>문제에 이 말이 나오면</th><th>답</th></tr>
+      <tr><td>"클래스 간의 관계, 속성과 오퍼레이션"</td><td>클래스 다이어그램 (구조)</td></tr>
+      <tr><td>"액터, 시스템 기능, 사용자 관점"</td><td>유스케이스 다이어그램 (행위)</td></tr>
+      <tr><td>"시간 순서, 메시지 교환"</td><td>시퀀스 다이어그램 (행위)</td></tr>
+      <tr><td>"객체의 상태 변화"</td><td>상태 다이어그램 (행위)</td></tr>
+      <tr><td>"물리적 배치, 하드웨어"</td><td>배치 다이어그램 (구조)</td></tr>
+      <tr><td>"업무 흐름, 순서도, 분기"</td><td>활동 다이어그램 (행위)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "유스케이스 다이어그램은 구조 다이어그램이다" = 틀림! 유스케이스·시퀀스·활동·상태는 전부 <b>행위</b> 다이어그램이에요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. UML 다이어그램의 두 갈래는?",
+  o:["구조(정적)와 행위(동적)","입력과 출력","하드웨어와 소프트웨어","기능과 비기능"],
+  a:0, e:"멈춘 사진(구조) vs 움직이는 영상(행위)."},
+ {q:"2. 클래스들의 속성·기능과 클래스 간 관계를 그리는 다이어그램은?",
+  o:["클래스 다이어그램","시퀀스 다이어그램","활동 다이어그램","상태 다이어그램"],
+  a:0, e:"가장 많이 쓰이는 구조 다이어그램이에요."},
+ {q:"3. 구조(정적) 다이어그램이 아닌 것은?",
+  o:["클래스 다이어그램","패키지 다이어그램","유스케이스 다이어그램","배치 다이어그램"],
+  a:2, e:"유스케이스는 행위(동적) 다이어그램! 초단골 함정이에요."},
+ {q:"4. 사용자(액터) 관점에서 시스템의 기능을 표현하는 다이어그램은?",
+  o:["클래스","유스케이스","컴포넌트","객체"],
+  a:1, e:"액터 + 기능 = 유스케이스 다이어그램."},
+ {q:"5. 객체들이 시간 순서대로 주고받는 메시지를 표현하는 다이어그램은?",
+  o:["시퀀스 다이어그램","패키지 다이어그램","배치 다이어그램","복합체 구조"],
+  a:0, e:"'시간 순서'가 열쇠말 = 시퀀스!"},
+ {q:"6. '주문 → 결제됨 → 배송중 → 완료'처럼 객체의 상태 변화를 그리는 것은?",
+  o:["활동 다이어그램","상태 다이어그램","클래스 다이어그램","타이밍 다이어그램"],
+  a:1, e:"하나의 객체가 상태를 바꿔가는 모습 = 상태 다이어그램."},
+ {q:"7. 업무 처리 흐름을 순서도처럼 조건 분기까지 그리는 다이어그램은?",
+  o:["활동 다이어그램","객체 다이어그램","배치 다이어그램","패키지 다이어그램"],
+  a:0, e:"순서도 느낌 = 활동(액티비티) 다이어그램."},
+ {q:"8. 어느 하드웨어에 무엇이 설치되는지 물리적 배치를 그리는 것은?",
+  o:["배치 다이어그램","상태 다이어그램","유스케이스 다이어그램","시퀀스 다이어그램"],
+  a:0, e:"물리적·하드웨어 = 배치(디플로이먼트) 다이어그램. 구현 단계에서 써요."},
+ {q:"9. 구현 단계에서 주로 사용되는 다이어그램 짝은?",
+  o:["컴포넌트, 배치","유스케이스, 시퀀스","클래스, 객체","상태, 활동"],
+  a:0, e:"부품(컴포넌트)과 설치(배치)는 구현 단계의 관심사예요."},
+ {q:"10. '집이 사라지면 방도 사라진다'에 해당하는 UML 관계는? (복습!)",
+  o:["집합","포함","일반화","의존"],
+  a:1, e:"Day 12 복습! 같이 소멸 = 포함(채운 마름모)."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

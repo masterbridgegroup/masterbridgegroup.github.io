@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 · 2주차 총복습 + 종합 테스트</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 14 · 1과목 소프트웨어 설계 · 주간 복습</span>
+    <h1>2주차 총복습 + 종합 테스트</h1>
+    <p>2026-07-17 · 핵심 요약 + 종합 테스트 15문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>이번 주 핵심 한 장 요약</h2>
+    <table>
+      <tr><th>Day</th><th>꼭 기억할 것</th></tr>
+      <tr><td><b>8</b></td><td>도출 기법: 인터뷰·브레인스토밍(비판 금지·질보다 양)·설문·워크숍·관찰·프로토타입 / 액터=시스템 외부 사용자</td></tr>
+      <tr><td><b>9</b></td><td>분석=충돌 해결·타당성 / DFD 4요소: 프로세스(원)·흐름(화살표)·저장소(평행선)·단말(사각형) / 자료사전: {}반복 []선택 ()생략</td></tr>
+      <tr><td><b>10</b></td><td>명세서 조건: 명확·완전·일관·검증 가능·추적 가능 / 정형 명세=수학 기호(Z·VDM·페트리넷)</td></tr>
+      <tr><td><b>11</b></td><td>검토 3형제: 동료 검토(작성자 설명)·워크스루(미리 배포)·인스펙션(전문가 공식) / 베이스라인 후엔 공식 절차로만 변경</td></tr>
+      <tr><td><b>12</b></td><td>UML=사물·관계·다이어그램 / 관계 6종: 연관·집합(빈◇)·포함(채운◆)·일반화(상속)·의존(점선)·실체화</td></tr>
+      <tr><td><b>13</b></td><td>구조 6종 "클객컴배복패" / 행위: 유스케이스·시퀀스(시간 순서)·활동·상태·커뮤니케이션·타이밍</td></tr>
+    </table>
+    <div class="point"><b>공부법</b> — 표를 먼저 훑고 테스트를 푸세요. 틀린 문제는 해당 Day로 돌아가 다시 읽으면 됩니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>주간 종합 테스트 (15문제)</h2>
+    <p style="font-size:13px;color:#777;">시험처럼 풀어보세요. 12개 이상 맞으면 아주 훌륭해요!</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 요구사항 개발 4단계의 올바른 순서는?",
+  o:["도출 → 분석 → 명세 → 확인","분석 → 도출 → 명세 → 확인","도출 → 명세 → 분석 → 확인","확인 → 분석 → 도출 → 명세"],
+  a:0, e:"도분명확!"},
+ {q:"2. 브레인스토밍의 원칙으로 옳은 것은?",
+  o:["비판을 장려한다","질보다 양, 비판 금지","한 명씩 허락받고 발언","아이디어는 하나만"],
+  a:1, e:"자유롭게 많이, 비판 없이!"},
+ {q:"3. 유스케이스에서 '액터'에 대한 설명으로 옳은 것은?",
+  o:["시스템 내부의 핵심 모듈","시스템 외부의 사용자나 외부 시스템","데이터베이스 테이블","프로그램 오류"],
+  a:1, e:"액터는 시스템 바깥 존재예요."},
+ {q:"4. DFD에서 '단말'을 표시하는 모양은?",
+  o:["원","화살표","평행선","사각형"],
+  a:3, e:"바깥 손님은 네모 명함 — 단말=사각형."},
+ {q:"5. DFD의 구성 요소 4가지로 옳은 것은?",
+  o:["프로세스, 자료 흐름, 자료 저장소, 단말","클래스, 객체, 관계, 패키지","도출, 분석, 명세, 확인","입력, 처리, 출력, 저장"],
+  a:0, e:"프로세스(원)·흐름(화살표)·저장소(평행선)·단말(사각형)."},
+ {q:"6. 자료 사전에서 ( ) 기호의 뜻은?",
+  o:["반복","선택","생략 가능","주석"],
+  a:2, e:"( ) = 있어도 없어도 됨 = 생략 가능."},
+ {q:"7. 좋은 요구사항 명세의 조건이 아닌 것은?",
+  o:["명확성","검증 가능성","일관성","모호성"],
+  a:3, e:"모호(애매)함은 나쁜 명세의 특징이에요!"},
+ {q:"8. 정형 명세 기법으로만 묶인 것은?",
+  o:["Z, VDM, 페트리넷","인터뷰, 설문, 관찰","동료 검토, 워크스루, 인스펙션","DFD, DD, ERD"],
+  a:0, e:"수학 기호 3인방 = Z·VDM·페트리넷."},
+ {q:"9. 작성자가 아닌 전문가팀이 공식 절차로 검토하는 기법은?",
+  o:["동료 검토","워크스루","인스펙션","브레인스토밍"],
+  a:2, e:"가장 격식 있는 검토 = 인스펙션."},
+ {q:"10. 확인을 통과한 명세서를 공식 기준으로 고정한 것은?",
+  o:["베이스라인","프로토타입","백로그","마일스톤"],
+  a:0, e:"기준선(baseline) — 이후 변경은 공식 절차로만."},
+ {q:"11. UML의 3대 구성 요소는?",
+  o:["사물, 관계, 다이어그램","점, 선, 면","입력, 처리, 출력","도출, 분석, 명세"],
+  a:0, e:"사관다!"},
+ {q:"12. '선수는 팀이 해체돼도 존재한다'에 해당하는 UML 관계는?",
+  o:["포함","집합","일반화","실체화"],
+  a:1, e:"부분이 독립 가능 = 집합(빈 마름모)."},
+ {q:"13. '자동차는 탈것의 한 종류다'에 해당하는 UML 관계는?",
+  o:["연관","의존","일반화","집합"],
+  a:2, e:"'~의 한 종류' = 일반화(상속)."},
+ {q:"14. 객체들이 시간 순서에 따라 주고받는 메시지를 그리는 다이어그램은?",
+  o:["클래스 다이어그램","시퀀스 다이어그램","패키지 다이어그램","배치 다이어그램"],
+  a:1, e:"시간 순서 = 시퀀스."},
+ {q:"15. 행위(동적) 다이어그램이 아닌 것은?",
+  o:["유스케이스 다이어그램","활동 다이어그램","상태 다이어그램","클래스 다이어그램"],
+  a:3, e:"클래스 다이어그램은 구조(정적)! 항상 나오는 함정입니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='주간 테스트 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=12?'2주차 완벽 통과! 벌써 요구공학 마스터 🎉':correct>=9?'좋아요! 틀린 Day만 다시 훑어보세요.':'요약표를 한 번 더 읽고 내일 다시 풀어보면 확 올라요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>
