@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 18 · 애플리케이션 설계와 모듈화 — 좋은 설계의 조건</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 18 · 1과목 소프트웨어 설계</span>
+    <h1>애플리케이션 설계와 모듈화 — 좋은 설계의 조건</h1>
+    <p>2026-07-21 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 시퀀스 다이어그램의 구성 요소를 배웠어요. 객체가 존재하는 시간을 나타내는 점선이 <b>생명선</b>, 실제로 일하고 있는 구간을 나타내는 가늘고 긴 사각형이 <b>활성 상자</b>였죠. 그리고 동기 메시지는 전화(답을 기다림), 비동기 메시지는 문자(안 기다림)라는 비유, 기억나시죠?</p>
+  </section>
+
+  <section>
+    <h2>1. 상위 설계와 하위 설계</h2>
+    <p>설계는 크게 두 단계로 나뉘어요.</p>
+    <table>
+      <tr><th>구분</th><th>다른 이름</th><th>하는 일</th></tr>
+      <tr><td><b>상위 설계</b></td><td>아키텍처 설계, 예비 설계</td><td>시스템의 <b>전체 뼈대</b>를 잡음 — 구조, 데이터베이스, 인터페이스 등</td></tr>
+      <tr><td><b>하위 설계</b></td><td>모듈 설계, 상세 설계</td><td>각 부품(모듈)의 <b>내부를 자세히</b> 설계 — 알고리즘, 자료구조 등</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 집을 지을 때 "방 3개, 2층 구조, 남향"을 정하는 게 상위 설계, "안방 콘센트 위치, 벽지 색"까지 정하는 게 하위 설계예요.</div>
+    <div class="point"><b>시험 포인트</b> — 상위 = 전체 구조(아키텍처), 하위 = 모듈 내부 상세. 어느 단계 설명인지 구분하는 문제가 나와요.</div>
+  </section>
+
+  <section>
+    <h2>2. 소프트웨어 아키텍처</h2>
+    <p><b>소프트웨어 아키텍처</b>는 시스템 전체의 <b>큰 그림(뼈대 구조)</b>이에요. 구성 요소들과 그들 사이의 관계를 정의합니다. 자주 쓰이는 구조를 정리한 것이 <b>아키텍처 패턴</b>이에요.</p>
+    <table>
+      <tr><th>패턴</th><th>설명</th></tr>
+      <tr><td><b>레이어(계층화) 패턴</b></td><td>시스템을 층(레이어)으로 나눔. 각 층은 바로 이웃한 층하고만 소통</td></tr>
+      <tr><td><b>클라이언트-서버 패턴</b></td><td>요청하는 쪽(클라이언트)과 서비스를 제공하는 쪽(서버)으로 나눔</td></tr>
+      <tr><td><b>파이프-필터 패턴</b></td><td>데이터가 필터(처리기)들을 순서대로 통과하며 가공됨</td></tr>
+      <tr><td><b>MVC 패턴</b></td><td>모델(데이터)·뷰(화면)·컨트롤러(중간 조율)로 역할을 3분할</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 파이프-필터는 공장의 컨베이어 벨트(재료가 기계들을 차례로 통과), MVC는 식당의 주방(모델)·홀 테이블(뷰)·서빙 직원(컨트롤러)이에요.</div>
+    <div class="point"><b>시험 포인트</b> — MVC의 M(Model, 데이터)·V(View, 화면)·C(Controller, 제어) 역할 구분과 파이프-필터의 "데이터 스트림 단계적 처리"가 단골!</div>
+  </section>
+
+  <section>
+    <h2>3. 모듈과 모듈화</h2>
+    <p><b>모듈(module)</b>은 소프트웨어를 기능 단위로 쪼갠 <b>부품</b>이에요. <b>모듈화</b>는 큰 시스템을 이런 작은 부품들로 나누는 작업이죠.</p>
+    <div class="easy"><b>비유</b> — 레고 블록이에요. 큰 성을 한 덩어리로 만들면 수리가 힘들지만, 블록(모듈)으로 만들면 문짝 하나만 갈아 끼울 수 있죠.</div>
+    <p>모듈화를 잘하면: 프로그램이 이해하기 쉬워지고, 수정이 편해지고(유지보수 ↑), 재사용도 가능해요. 단, 너무 잘게 쪼개면 모듈 수가 많아져 관리 비용이 늘어납니다.</p>
+    <div class="point"><b>시험 포인트</b> — 좋은 모듈화의 기준: <b>결합도는 낮게, 응집도는 높게</b>. 이 한 줄이 이번 주 최고 핵심 문장입니다 (내일·모레 자세히 배워요).</div>
+  </section>
+
+  <section>
+    <h2>4. 추상화와 정보 은닉</h2>
+    <p><b>추상화(abstraction)</b>: 복잡한 내용에서 <b>핵심만 뽑아 단순하게</b> 표현하는 것. 지도가 실제 도시의 모든 건물을 그리지 않고 길만 그리는 것과 같아요.</p>
+    <p><b>정보 은닉(information hiding)</b>: 모듈 내부의 세부 사항을 <b>밖에서 못 보게 감추는 것</b>. 다른 모듈은 정해진 창구(인터페이스)로만 소통해요.</p>
+    <div class="easy"><b>비유</b> — 자판기예요. 우리는 버튼(인터페이스)만 누르면 되고, 안에서 어떤 기계가 어떻게 움직이는지(내부 구현)는 몰라도 되죠. 이게 정보 은닉!</div>
+    <div class="point"><b>시험 포인트</b> — 정보 은닉의 장점: 내부를 바꿔도 다른 모듈에 영향이 적다 → 수정·테스트가 쉽다. "부작용(side effect) 감소"라는 표현으로도 나와요.</div>
+  </section>
+
+  <section>
+    <h2>5. 팬인과 팬아웃</h2>
+    <p>모듈 구조도(계층도)에서 모듈 하나를 기준으로:</p>
+    <table>
+      <tr><th>용어</th><th>의미</th><th>기억법</th></tr>
+      <tr><td><b>팬인</b> (Fan-In)</td><td>나를 <b>호출하는(부르는)</b> 상위 모듈의 수</td><td>In = 나에게 들어오는 화살표 수</td></tr>
+      <tr><td><b>팬아웃</b> (Fan-Out)</td><td>내가 <b>호출하는</b> 하위 모듈의 수</td><td>Out = 나에게서 나가는 화살표 수</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 회사로 치면 팬인은 '나를 찾는 상사 수', 팬아웃은 '내가 일을 시키는 부하 수'예요. 팬인이 높은 모듈은 여러 곳에서 재사용되는 인기 모듈이죠.</div>
+    <div class="point"><b>시험 포인트</b> — 구조도를 주고 특정 모듈의 팬인·팬아웃 개수를 세는 계산 문제가 나와요. <b>들어오는 화살표 = 팬인, 나가는 화살표 = 팬아웃</b>만 기억하면 쉬워요. 일반적으로 팬인은 높게(재사용 많음), 팬아웃은 적게 유지하는 것이 좋은 설계입니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 시스템의 전체 구조(뼈대)를 잡는 설계 단계는?",
+  o:["하위 설계","상위 설계","단위 테스트","유지보수"],
+  a:1, e:"상위 설계(아키텍처 설계)는 전체 구조를, 하위 설계(상세 설계)는 모듈 내부를 다룹니다."},
+ {q:"2. 하위 설계(상세 설계)에서 다루는 내용으로 가장 알맞은 것은?",
+  o:["시스템 전체의 계층 구조","각 모듈의 내부 알고리즘과 자료구조","프로젝트 예산 계획","마케팅 전략"],
+  a:1, e:"하위 설계는 부품(모듈) 하나하나의 내부를 자세히 설계합니다."},
+ {q:"3. 데이터가 여러 처리기(필터)를 순서대로 통과하며 가공되는 아키텍처 패턴은?",
+  o:["레이어 패턴","클라이언트-서버 패턴","파이프-필터 패턴","MVC 패턴"],
+  a:2, e:"컨베이어 벨트처럼 데이터가 필터들을 차례로 지나가는 구조 = 파이프-필터."},
+ {q:"4. MVC 패턴에서 C(Controller)의 역할은?",
+  o:["데이터를 저장·관리한다","사용자에게 화면을 보여준다","모델과 뷰 사이를 조율(제어)한다","네트워크 통신을 담당한다"],
+  a:2, e:"Model=데이터, View=화면, Controller=둘 사이의 중간 조율자입니다."},
+ {q:"5. 모듈화의 장점으로 보기 어려운 것은?",
+  o:["프로그램을 이해하기 쉬워진다","수정과 유지보수가 편해진다","모듈을 재사용할 수 있다","모듈 수가 많을수록 무조건 비용이 줄어든다"],
+  a:3, e:"너무 잘게 쪼개면 모듈 관리(통합) 비용이 오히려 늘어납니다. 적절한 크기가 중요해요."},
+ {q:"6. 복잡한 내용에서 핵심만 뽑아 단순하게 표현하는 설계 개념은?",
+  o:["추상화","정보 은닉","컴파일","디버깅"],
+  a:0, e:"추상화는 지도처럼 핵심만 남기고 단순화하는 것입니다."},
+ {q:"7. 모듈 내부의 세부 사항을 감추고 정해진 인터페이스로만 소통하게 하는 것은?",
+  o:["모듈 통합","정보 은닉","팬아웃","리팩토링"],
+  a:1, e:"정보 은닉(information hiding). 자판기 버튼처럼 내부를 몰라도 쓸 수 있게 해요."},
+ {q:"8. 어떤 모듈을 호출하는 상위 모듈의 수를 뜻하는 용어는?",
+  o:["팬아웃(Fan-Out)","응집도","팬인(Fan-In)","결합도"],
+  a:2, e:"팬인 = 나에게 들어오는 화살표 수(나를 부르는 모듈 수)입니다."},
+ {q:"9. [복습] 시퀀스 다이어그램에서 객체가 존재하는 시간을 나타내는 점선은?",
+  o:["활성 상자","생명선","메시지","링크"],
+  a:1, e:"생명선(lifeline)! 실제 일하는 구간은 활성 상자였죠."},
+ {q:"10. [복습] 요청을 보내고 답을 기다리지 않은 채 다른 일을 하는 메시지 유형은?",
+  o:["동기 메시지","응답 메시지","자체 메시지","비동기 메시지"],
+  a:3, e:"비동기 메시지 = 문자 보내기. 답을 기다리는 동기 메시지 = 전화였어요."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

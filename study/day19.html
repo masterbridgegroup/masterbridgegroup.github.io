@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 19 · 결합도 — 모듈 사이는 느슨할수록 좋다</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 19 · 1과목 소프트웨어 설계</span>
+    <h1>결합도 — 모듈 사이는 느슨할수록 좋다</h1>
+    <p>2026-07-22 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 좋은 모듈화의 기준은 <b>"결합도는 낮게, 응집도는 높게"</b>라고 했죠. 그리고 팬인은 나를 부르는 모듈 수(들어오는 화살표), 팬아웃은 내가 부르는 모듈 수(나가는 화살표)였어요. 오늘은 그중 <b>결합도</b>를 6단계로 자세히 파헤칩니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 결합도란?</h2>
+    <p><b>결합도(Coupling)</b>는 <b>모듈과 모듈 사이가 서로 얼마나 엮여(의존하고) 있는가</b>의 정도예요. 결합도가 <b>낮을수록 좋은 설계</b>입니다.</p>
+    <div class="easy"><b>비유</b> — 옆 부서와의 관계예요. 필요한 서류만 딱 주고받는 부서(낮은 결합도)는 한쪽이 바뀌어도 문제없지만, 서로의 책상 서랍까지 뒤져 쓰는 부서(높은 결합도)는 한쪽이 이사만 가도 대혼란이 오죠.</div>
+    <p>결합도가 낮으면: 한 모듈을 고쳐도 다른 모듈에 영향이 적고, 재사용이 쉬워요.</p>
+    <div class="point"><b>시험 포인트</b> — 결합도는 낮을수록 좋다! 그리고 아래 6단계의 <b>순서</b>가 핵심 출제 포인트입니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 결합도 6단계 한눈에 보기</h2>
+    <p>낮음(좋음) → 높음(나쁨) 순서:</p>
+    <table>
+      <tr><th>순서</th><th>이름</th><th>핵심</th></tr>
+      <tr><td>1 (가장 좋음)</td><td><b>자료</b> 결합도</td><td>필요한 값(데이터)만 주고받음</td></tr>
+      <tr><td>2</td><td><b>스탬프</b> 결합도</td><td>자료 구조(묶음) 전체를 통째로 전달</td></tr>
+      <tr><td>3</td><td><b>제어</b> 결합도</td><td>동작을 지시하는 신호(플래그)를 전달</td></tr>
+      <tr><td>4</td><td><b>외부</b> 결합도</td><td>외부에 선언된 데이터를 여러 모듈이 참조</td></tr>
+      <tr><td>5</td><td><b>공통</b> 결합도</td><td>전역 변수(공용 데이터 영역)를 함께 사용</td></tr>
+      <tr><td>6 (가장 나쁨)</td><td><b>내용</b> 결합도</td><td>다른 모듈의 내부를 직접 건드림</td></tr>
+    </table>
+    <div class="easy"><b>암기법</b> — "<b>자스제외공내</b>" (자·스·제·외·공·내). 앞으로 갈수록 좋고 뒤로 갈수록 나빠요. 소리 내서 다섯 번만 읽어보세요!</div>
+    <div class="point"><b>시험 포인트</b> — "결합도가 낮은 것부터/높은 것부터 나열하시오"가 매년 나오는 단골 문제. 자스제외공내!</div>
+  </section>
+
+  <section>
+    <h2>3. 좋은 결합 — 자료 결합도와 스탬프 결합도</h2>
+    <p><b>자료(Data) 결합도</b>: 모듈끼리 <b>꼭 필요한 값만</b> 매개변수(전달값)로 주고받는 가장 이상적인 관계예요. 예: 두 숫자를 주면 합계를 돌려주는 계산기 모듈.</p>
+    <p><b>스탬프(Stamp) 결합도</b>: 낱개 값이 아니라 <b>자료 구조(배열이나 레코드 같은 데이터 묶음) 전체</b>를 넘겨요. 받는 쪽은 그중 일부만 쓰는데도 통째로 받죠.</p>
+    <div class="easy"><b>비유</b> — 자료 결합도는 "생년월일만 알려주세요", 스탬프 결합도는 "주민등록등본을 통째로 주세요(생일만 볼 건데)"예요. 등본 양식이 바뀌면 안 쓰는 항목 때문에도 영향을 받을 수 있죠.</div>
+    <div class="point"><b>시험 포인트</b> — "자료 구조(레코드) 전체를 전달" = 스탬프 결합도. 자료 결합도와 구분하세요.</div>
+  </section>
+
+  <section>
+    <h2>4. 나빠지기 시작 — 제어 결합도와 외부 결합도</h2>
+    <p><b>제어(Control) 결합도</b>: 데이터가 아니라 <b>"이렇게 동작해!"라는 지시 신호(제어 플래그)</b>를 넘겨요. 받는 모듈의 내부 동작 순서를 밖에서 조종하는 셈이라 좋지 않아요.</p>
+    <div class="easy"><b>비유</b> — 음식 재료(데이터)를 주는 게 아니라 "3번 레시피로 요리해!"라고 주방의 조리 방식 자체를 지시하는 것과 같아요. 주방이 레시피 번호를 바꾸면 지시하던 쪽도 다 바꿔야 하죠.</div>
+    <p><b>외부(External) 결합도</b>: 여러 모듈이 <b>외부에서 선언된 데이터(다른 모듈에서 선언한 변수)</b>를 함께 참조할 때 생겨요.</p>
+    <div class="point"><b>시험 포인트</b> — "제어 플래그·신호 전달" = 제어 결합도. 이 단어가 보이면 바로 답!</div>
+  </section>
+
+  <section>
+    <h2>5. 최악의 결합 — 공통 결합도와 내용 결합도</h2>
+    <p><b>공통(Common) 결합도</b>: 여러 모듈이 <b>전역 변수(누구나 접근 가능한 공용 데이터)</b>를 같이 읽고 써요. 누가 언제 바꿨는지 추적이 어려워 오류의 온상이 됩니다.</p>
+    <div class="easy"><b>비유</b> — 온 가족이 하나의 공용 지갑을 쓰는 것. 잔액이 안 맞아도 누가 썼는지 알 수 없어요.</div>
+    <p><b>내용(Content) 결합도</b>: 한 모듈이 <b>다른 모듈의 내부 데이터나 코드를 직접 건드리는</b> 최악의 관계예요. 상대 모듈이 조금만 바뀌어도 바로 고장 납니다.</p>
+    <div class="easy"><b>비유</b> — 옆집 냉장고를 허락 없이 열어 재료를 꺼내 쓰는 격이에요. 옆집이 냉장고 정리만 해도 우리 집 요리가 망하죠.</div>
+    <div class="point"><b>시험 포인트</b> — 가장 결합도가 높은(나쁜) 것 = <b>내용 결합도</b>, 가장 낮은(좋은) 것 = <b>자료 결합도</b>. "전역 변수 공유" = 공통 결합도.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 결합도(Coupling)에 대한 설명으로 옳은 것은?",
+  o:["모듈 내부 요소들이 뭉쳐 있는 정도로, 높을수록 좋다","모듈 사이의 의존 정도로, 낮을수록 좋다","모듈 사이의 의존 정도로, 높을수록 좋다","모듈의 실행 속도를 뜻한다"],
+  a:1, e:"결합도 = 모듈 '사이'의 엮임 정도. 낮을수록 수정·재사용이 쉬운 좋은 설계입니다."},
+ {q:"2. 결합도를 낮은 것부터 높은 것 순서로 올바르게 나열한 것은?",
+  o:["자료 → 스탬프 → 제어 → 외부 → 공통 → 내용","자료 → 제어 → 스탬프 → 공통 → 외부 → 내용","내용 → 공통 → 외부 → 제어 → 스탬프 → 자료","스탬프 → 자료 → 외부 → 제어 → 내용 → 공통"],
+  a:0, e:"'자스제외공내'! 자료-스탬프-제어-외부-공통-내용 순으로 나빠집니다."},
+ {q:"3. 꼭 필요한 값(데이터)만 매개변수로 주고받는 가장 바람직한 결합도는?",
+  o:["스탬프 결합도","공통 결합도","자료 결합도","제어 결합도"],
+  a:2, e:"자료(Data) 결합도가 가장 낮고 이상적인 결합입니다."},
+ {q:"4. 배열이나 레코드 같은 자료 구조 전체를 모듈 간에 전달할 때의 결합도는?",
+  o:["자료 결합도","스탬프 결합도","내용 결합도","외부 결합도"],
+  a:1, e:"묶음(자료 구조)을 통째로 전달 = 스탬프 결합도. 등본 통째로 주기 비유였죠."},
+ {q:"5. 다른 모듈의 동작을 지시하는 제어 플래그(신호)를 전달하는 결합도는?",
+  o:["자료 결합도","외부 결합도","공통 결합도","제어 결합도"],
+  a:3, e:"'제어 신호·플래그'가 보이면 제어 결합도입니다."},
+ {q:"6. 여러 모듈이 전역 변수(공용 데이터 영역)를 함께 사용할 때의 결합도는?",
+  o:["공통 결합도","스탬프 결합도","자료 결합도","제어 결합도"],
+  a:0, e:"전역 변수 공유 = 공통(Common) 결합도. 공용 지갑 비유를 기억하세요."},
+ {q:"7. 결합도가 가장 높은(가장 나쁜) 것은?",
+  o:["자료 결합도","내용 결합도","스탬프 결합도","외부 결합도"],
+  a:1, e:"내용 결합도는 다른 모듈 내부를 직접 건드리는 최악의 결합입니다."},
+ {q:"8. 결합도를 낮추면 얻는 효과로 보기 어려운 것은?",
+  o:["한 모듈 수정 시 다른 모듈에 영향이 적다","모듈 재사용이 쉬워진다","오류 추적이 쉬워진다","모듈들이 전역 변수를 더 자유롭게 공유한다"],
+  a:3, e:"전역 변수 공유는 오히려 결합도(공통 결합도)를 높이는 나쁜 습관입니다."},
+ {q:"9. [복습] 모듈 구조도에서 어떤 모듈이 호출하는 하위 모듈의 수를 뜻하는 것은?",
+  o:["팬인(Fan-In)","응집도","팬아웃(Fan-Out)","다중성"],
+  a:2, e:"내가 부르는(나가는 화살표) 수 = 팬아웃. 나를 부르는 수 = 팬인."},
+ {q:"10. [복습] 모듈 내부 세부 사항을 감추고 인터페이스로만 소통하게 하는 설계 원칙은?",
+  o:["정보 은닉","추상화","일반화","캡슐 분리"],
+  a:0, e:"정보 은닉! 자판기 버튼 비유를 떠올리세요. 내부가 바뀌어도 밖은 영향이 적어요."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

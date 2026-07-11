@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 21 · 3주차 총복습 + 종합 테스트</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 21 · 1과목 소프트웨어 설계</span>
+    <h1>3주차 총복습 + 종합 테스트</h1>
+    <p>2026-07-24 · 이번 주 핵심 정리 + 종합 테스트 15문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 배운 응집도의 결론 한 줄: 이상적인 모듈은 <b>자료 결합도 + 기능적 응집도</b>예요. 필요한 값만 주고받고(자료 결합), 자기 일 하나만 똑부러지게 하는(기능적 응집) 모듈이 최고의 모듈입니다. 오늘은 이번 주 전체를 정리하고 15문제로 실력을 점검해요!</p>
+  </section>
+
+  <section>
+    <h2>1. 유스케이스 다이어그램 요약 (Day 15)</h2>
+    <p><b>사용자 관점</b>에서 시스템 기능을 그린 그림. 액터(막대 사람, 사각형 밖) + 유스케이스(타원) + 관계.</p>
+    <table>
+      <tr><th>관계</th><th>구분 키워드</th></tr>
+      <tr><td>포함 (include)</td><td><b>반드시</b> 함께 실행 (점선 화살표)</td></tr>
+      <tr><td>확장 (extend)</td><td><b>조건부·선택적</b> 실행 (점선 화살표)</td></tr>
+      <tr><td>일반화</td><td>부모-자식 관계 (빈 삼각형 화살표)</td></tr>
+    </table>
+    <div class="point"><b>기억!</b> — 반드시 = include / 선택 = extend. 액터는 외부 시스템도 가능.</div>
+  </section>
+
+  <section>
+    <h2>2. 클래스 다이어그램 요약 (Day 16)</h2>
+    <p>3칸 사각형(<b>이름 → 속성 → 오퍼레이션</b>), 접근 제어자(<b>+public, -private, #protected, ~package</b>).</p>
+    <p>관계 6가지: 연관(실선) · <b>집합(빈 마름모, 부분 독립 가능)</b> · <b>합성(찬 마름모, 운명 공동체)</b> · 일반화(빈 삼각형+실선) · 의존(점선 화살표) · 실체화(빈 삼각형+점선)</p>
+    <div class="point"><b>기억!</b> — 집합 vs 합성 = 마름모 속이 비었나 찼나. 학교-학생 vs 몸-심장.</div>
+  </section>
+
+  <section>
+    <h2>3. 시퀀스 다이어그램 요약 (Day 17)</h2>
+    <p><b>시간 순서(위→아래)</b>로 객체 간 메시지를 그리는 동적 다이어그램. 생명선(존재 시간, 점선) + 활성 상자(일하는 구간) + 메시지.</p>
+    <p>동기 메시지 = 전화(기다림, 찬 화살촉) / 비동기 = 문자(안 기다림, 열린 화살촉) / 응답 = 점선.</p>
+    <p>친구들: <b>커뮤니케이션</b>(관계 중심 + 메시지 번호), <b>상태</b>(한 객체의 상태 변화), <b>활동</b>(업무 흐름 순서도).</p>
+    <div class="point"><b>기억!</b> — "번호로 순서 표현" = 커뮤니케이션, "하나의 객체의 상태 변화" = 상태, "업무 흐름 순서도" = 활동 다이어그램.</div>
+  </section>
+
+  <section>
+    <h2>4. 설계와 모듈화 요약 (Day 18)</h2>
+    <p><b>상위 설계</b>(전체 뼈대·아키텍처) vs <b>하위 설계</b>(모듈 내부 상세). 아키텍처 패턴: 레이어, 클라이언트-서버, 파이프-필터(컨베이어 벨트), MVC(모델·뷰·컨트롤러).</p>
+    <p><b>모듈화</b> = 레고 블록처럼 쪼개기. <b>추상화</b> = 핵심만 남기기. <b>정보 은닉</b> = 내부 감추고 인터페이스로만 소통. <b>팬인</b> = 들어오는 화살표(나를 부르는 수), <b>팬아웃</b> = 나가는 화살표(내가 부르는 수).</p>
+    <div class="point"><b>기억!</b> — 좋은 모듈: 결합도 ↓ 응집도 ↑, 팬인 ↑ 팬아웃 ↓.</div>
+  </section>
+
+  <section>
+    <h2>5. 결합도·응집도 요약 (Day 19~20)</h2>
+    <table>
+      <tr><th></th><th>결합도 (사이, 낮을수록 좋음)</th><th>응집도 (안, 높을수록 좋음)</th></tr>
+      <tr><td>암기</td><td>자스제외공내 (좋음→나쁨)</td><td>우논시절교순기 (나쁨→좋음)</td></tr>
+      <tr><td>최고</td><td>자료 결합도</td><td>기능적 응집도</td></tr>
+      <tr><td>최악</td><td>내용 결합도</td><td>우연적 응집도</td></tr>
+    </table>
+    <p>구분 키워드: 자료구조 통째 전달=스탬프 / 제어 플래그=제어 / 전역 변수=공통 / 출력→다음 입력=순차적 / 같은 데이터 사용=교환적 / 초기화 모듈=시간적.</p>
+    <div class="point"><b>기억!</b> — 이 표만 통째로 외우면 이번 주 시험 문제 절반은 해결됩니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>3주차 종합 테스트 (15문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 유스케이스 다이어그램의 목적으로 가장 알맞은 것은?",
+  o:["데이터베이스 테이블 설계","사용자 관점에서 시스템 기능 표현","코드의 실행 속도 측정","서버 배치 구조 표현"],
+  a:1, e:"유스케이스 다이어그램은 사용자 눈높이에서 '무엇을 할 수 있는가'를 그립니다."},
+ {q:"2. '주문' 유스케이스를 실행하려면 '로그인' 유스케이스가 반드시 선행되어야 할 때의 관계는?",
+  o:["extend","일반화","include","연관"],
+  a:2, e:"'반드시' = include(포함) 관계입니다."},
+ {q:"3. 쿠폰이 있을 때만 '쿠폰 적용' 기능이 실행된다면 이 관계는?",
+  o:["extend","include","실체화","합성"],
+  a:0, e:"조건부·선택적 실행 = extend(확장) 관계입니다."},
+ {q:"4. 클래스 표기법에서 접근 제어자 '-'의 의미는?",
+  o:["public — 누구나 접근","private — 해당 클래스 안에서만","protected — 자식까지","package — 같은 패키지"],
+  a:1, e:"- 는 private(비공개). + public, # protected, ~ package도 함께 기억!"},
+ {q:"5. '몸과 심장'처럼 전체가 사라지면 부분도 사라지는 클래스 관계와 그 표기는?",
+  o:["집합 — 속이 빈 마름모","의존 — 점선 화살표","일반화 — 빈 삼각형","합성 — 속이 찬 마름모"],
+  a:3, e:"합성(composition)은 속이 찬 마름모. 부분이 독립 가능한 집합(빈 마름모)과 구분!"},
+ {q:"6. 다중성 표기 '0..*'의 의미는?",
+  o:["정확히 0개","1개 이상","0개 이상 (없어도 되고 많아도 됨)","0개 또는 1개"],
+  a:2, e:"0..* (또는 *)는 0개 이상 — 하나도 없어도 되고 여러 개여도 됩니다."},
+ {q:"7. 시퀀스 다이어그램에서 객체가 실제로 작업 중인 구간을 나타내는 것은?",
+  o:["활성 상자","생명선","시스템 경계","메시지 번호"],
+  a:0, e:"활성 상자(활성 구간)! 생명선은 '존재하는 시간'을 나타내는 점선이었죠."},
+ {q:"8. 객체 간 연결 관계를 중심으로 그리고 메시지에 번호를 붙여 순서를 표현하는 다이어그램은?",
+  o:["시퀀스 다이어그램","상태 다이어그램","활동 다이어그램","커뮤니케이션 다이어그램"],
+  a:3, e:"커뮤니케이션 다이어그램 = 관계도 + 메시지 번호."},
+ {q:"9. 시스템 전체의 뼈대(구성 요소와 관계)를 정의하는 상위 설계 산출물은?",
+  o:["단위 테스트 케이스","소프트웨어 아키텍처","사용자 매뉴얼","소스 코드"],
+  a:1, e:"소프트웨어 아키텍처는 시스템의 큰 그림(뼈대)입니다."},
+ {q:"10. MVC 패턴에서 데이터를 저장·관리하는 역할은?",
+  o:["Model","View","Controller","Router"],
+  a:0, e:"M(Model)=데이터, V(View)=화면, C(Controller)=중간 조율자."},
+ {q:"11. 모듈 내부 구현을 감춰서 다른 모듈의 부작용(side effect)을 줄이는 설계 원칙은?",
+  o:["팬아웃","모듈 통합","정보 은닉","우연적 응집"],
+  a:2, e:"정보 은닉 — 자판기처럼 버튼(인터페이스)만 공개하고 내부는 감춥니다."},
+ {q:"12. 결합도가 낮은 것에서 높은 것 순서로 옳은 것은?",
+  o:["자료 → 스탬프 → 제어 → 외부 → 공통 → 내용","자료 → 제어 → 스탬프 → 외부 → 내용 → 공통","내용 → 공통 → 외부 → 제어 → 스탬프 → 자료","스탬프 → 자료 → 제어 → 공통 → 외부 → 내용"],
+  a:0, e:"자스제외공내! 이 순서는 시험 전날에도 꼭 다시 확인하세요."},
+ {q:"13. 여러 모듈이 전역 변수를 공유할 때 발생하는 결합도는?",
+  o:["자료 결합도","공통 결합도","스탬프 결합도","제어 결합도"],
+  a:1, e:"전역 변수(공용 데이터) 공유 = 공통 결합도."},
+ {q:"14. 응집도가 높은 것부터 낮은 것 순서로 처음 세 개를 올바르게 나열한 것은?",
+  o:["우연적 → 논리적 → 시간적","기능적 → 교환적 → 순차적","기능적 → 순차적 → 교환적","순차적 → 기능적 → 절차적"],
+  a:2, e:"높은 쪽부터: 기능적 → 순차적 → 교환적 → 절차적 → 시간적 → 논리적 → 우연적."},
+ {q:"15. 가장 이상적인 모듈이 갖추어야 할 조합은?",
+  o:["내용 결합도 + 기능적 응집도","자료 결합도 + 우연적 응집도","공통 결합도 + 순차적 응집도","자료 결합도 + 기능적 응집도"],
+  a:3, e:"결합도는 가장 낮은 '자료', 응집도는 가장 높은 '기능적'이 최고의 조합입니다!"}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=12?'훌륭해요! 3주차 완벽 통과입니다 💪':correct>=9?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 요약을 한 번 더 읽고 자면 다음 주가 더 쉬워져요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

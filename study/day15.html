@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 15 · 유스케이스 다이어그램 — 시스템 기능을 그림 한 장으로</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 15 · 1과목 소프트웨어 설계</span>
+    <h1>유스케이스 다이어그램 — 시스템 기능을 그림 한 장으로</h1>
+    <p>2026-07-18 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>지난 시간에 UML 다이어그램은 크게 <b>구조(정적) 다이어그램</b>과 <b>행위(동적) 다이어그램</b>으로 나뉜다고 배웠어요. 구조 다이어그램은 시스템의 뼈대(클래스·객체·컴포넌트 등)를 그리고, 행위 다이어그램은 시스템이 움직이는 모습(유스케이스·시퀀스·활동 등)을 그립니다. 오늘 배울 유스케이스 다이어그램은 <b>행위 다이어그램</b>의 대표 선수예요.</p>
+  </section>
+
+  <section>
+    <h2>1. 유스케이스 다이어그램이란?</h2>
+    <p>유스케이스(Use Case, 사용 사례) 다이어그램은 <b>"이 시스템으로 사용자가 무엇을 할 수 있는가?"</b>를 사용자 눈높이에서 그린 그림이에요. 개발자가 아니라 <b>사용자 관점</b>에서 시스템의 기능을 표현하는 것이 핵심입니다.</p>
+    <div class="easy"><b>비유</b> — 식당의 메뉴판과 같아요. 주방(내부 구조)이 어떻게 생겼는지는 안 보여주고, 손님이 "주문할 수 있는 것"만 보여주죠. 유스케이스 다이어그램도 시스템 내부는 숨기고 '할 수 있는 일'만 보여줍니다.</div>
+    <p>주로 <b>요구사항 분석 단계</b>에서 고객과 개발자가 의사소통하는 도구로 쓰여요.</p>
+    <div class="point"><b>시험 포인트</b> — "사용자 관점에서 시스템의 기능을 표현", "요구사항 분석 단계에서 사용" = 유스케이스 다이어그램.</div>
+  </section>
+
+  <section>
+    <h2>2. 구성 요소 ① — 시스템과 액터</h2>
+    <p><b>시스템(System)</b>은 만들려는 소프트웨어의 범위예요. 큰 <b>사각형</b>으로 그리고, 그 안에 기능들을 넣습니다.</p>
+    <p><b>액터(Actor, 행위자)</b>는 시스템과 상호작용하는 <b>사람 또는 외부 시스템</b>이에요. 막대기 사람 모양으로 그리고, 사각형 <b>바깥</b>에 둡니다.</p>
+    <table>
+      <tr><th>종류</th><th>설명</th><th>예시</th></tr>
+      <tr><td>주액터</td><td>시스템을 사용해 이득을 얻는 쪽 (주로 사람)</td><td>쇼핑몰의 '고객'</td></tr>
+      <tr><td>부액터</td><td>주액터를 돕기 위해 시스템이 이용하는 외부 시스템</td><td>'카드 결제사 시스템'</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 식당에서 밥을 먹는 손님이 주액터, 식당이 재료를 받아오는 납품 업체가 부액터예요.</div>
+    <div class="point"><b>시험 포인트</b> — 액터는 사람만이 아니라 <b>외부 시스템도 될 수 있다</b>는 것, 그리고 액터는 시스템 사각형 '밖'에 그린다는 것이 자주 나와요.</div>
+  </section>
+
+  <section>
+    <h2>3. 구성 요소 ② — 유스케이스</h2>
+    <p><b>유스케이스</b>는 시스템이 제공하는 <b>기능 하나하나</b>예요. <b>타원(달걀 모양)</b> 안에 "상품 주문", "로그인"처럼 <b>동사형 이름</b>을 적습니다.</p>
+    <div class="easy"><b>비유</b> — 메뉴판의 메뉴 하나하나가 유스케이스예요. "김치찌개 주문", "포장 주문"처럼 손님이 할 수 있는 행동 단위로 적죠.</div>
+    <p>액터와 유스케이스는 <b>실선</b>으로 연결하는데, 이를 <b>연관 관계</b>(association)라고 해요.</p>
+    <div class="point"><b>시험 포인트</b> — 유스케이스는 타원, 액터와는 실선(연관 관계)으로 연결. 모양을 묻는 문제가 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 유스케이스 사이의 관계 — 포함·확장·일반화</h2>
+    <p>유스케이스끼리도 관계를 맺어요. 시험에 가장 많이 나오는 부분입니다!</p>
+    <table>
+      <tr><th>관계</th><th>표기</th><th>의미</th></tr>
+      <tr><td><b>포함</b> (include)</td><td>점선 화살표 + &laquo;include&raquo;</td><td>어떤 기능을 실행하려면 다른 기능이 <b>반드시</b> 먼저/함께 실행됨</td></tr>
+      <tr><td><b>확장</b> (extend)</td><td>점선 화살표 + &laquo;extend&raquo;</td><td><b>특정 조건일 때만 선택적으로</b> 실행되는 기능</td></tr>
+      <tr><td><b>일반화</b> (generalization)</td><td>속이 빈 삼각형 화살표 실선</td><td>추상적인 것과 구체적인 것의 부모-자식 관계</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — "상품 주문"을 하려면 <b>반드시</b> "로그인"을 해야 한다 → 포함(include). 주문할 때 <b>쿠폰이 있을 때만</b> "쿠폰 적용"을 한다 → 확장(extend). "결제"의 자식으로 "카드 결제"와 "계좌이체 결제"가 있다 → 일반화.</div>
+    <div class="point"><b>시험 포인트</b> — <b>반드시 = include, 선택적/조건부 = extend</b>. 이 구분이 단골 문제입니다. 둘 다 점선 화살표라는 것도 기억!</div>
+  </section>
+
+  <section>
+    <h2>5. 유스케이스 명세서</h2>
+    <p>다이어그램은 그림이라 자세한 내용을 담기 어려워요. 그래서 유스케이스 하나하나에 대해 <b>글로 상세히 적은 문서</b>가 <b>유스케이스 명세서</b>입니다.</p>
+    <p>주요 항목: 유스케이스 이름, 액터, <b>사전 조건</b>(시작 전에 갖춰야 할 것), <b>사후 조건</b>(끝난 뒤의 상태), 기본 흐름(정상 시나리오), 대체 흐름(예외 시나리오)</p>
+    <div class="easy"><b>비유</b> — 메뉴판(다이어그램)에는 "김치찌개"라고만 적혀 있지만, 주방 레시피(명세서)에는 재료·조리 순서·주의사항이 자세히 적혀 있는 것과 같아요.</div>
+    <div class="point"><b>시험 포인트</b> — 사전 조건(Precondition)과 사후 조건(Postcondition)의 뜻을 구분하는 문제가 나와요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 유스케이스 다이어그램에 대한 설명으로 가장 알맞은 것은?",
+  o:["시스템 내부의 클래스 구조를 표현한다","사용자 관점에서 시스템의 기능을 표현한다","데이터베이스의 테이블 관계를 표현한다","프로그램의 코드 실행 순서를 표현한다"],
+  a:1, e:"유스케이스 다이어그램은 개발자가 아닌 '사용자 관점'에서 시스템이 제공하는 기능을 그립니다."},
+ {q:"2. 유스케이스 다이어그램에서 액터(Actor)에 대한 설명으로 틀린 것은?",
+  o:["시스템과 상호작용하는 사람이 될 수 있다","외부 시스템도 액터가 될 수 있다","시스템 사각형 안쪽에 그린다","막대기 사람 모양으로 표현한다"],
+  a:2, e:"액터는 시스템 범위(사각형) '바깥'에 그립니다. 시스템의 일부가 아니기 때문이에요."},
+ {q:"3. 유스케이스를 표현하는 도형은?",
+  o:["사각형","마름모","삼각형","타원"],
+  a:3, e:"유스케이스는 타원(달걀 모양) 안에 '상품 주문'처럼 동사형 이름을 적습니다."},
+ {q:"4. 어떤 유스케이스를 실행하기 위해 다른 유스케이스가 반드시 실행되어야 하는 관계는?",
+  o:["포함(include) 관계","확장(extend) 관계","일반화 관계","연관 관계"],
+  a:0, e:"'반드시' = include(포함). 예: 주문하려면 반드시 로그인해야 한다."},
+ {q:"5. 특정 조건이 만족될 때만 선택적으로 실행되는 유스케이스와의 관계는?",
+  o:["포함(include) 관계","확장(extend) 관계","실체화 관계","의존 관계"],
+  a:1, e:"'선택적·조건부' = extend(확장). 예: 쿠폰이 있을 때만 쿠폰 적용."},
+ {q:"6. 주액터를 돕기 위해 시스템이 이용하는 외부 시스템을 부르는 말은?",
+  o:["주액터","유스케이스","부액터","시스템 경계"],
+  a:2, e:"부액터는 카드 결제사 시스템처럼 주액터의 목적 달성을 돕는 외부 시스템입니다."},
+ {q:"7. 액터와 유스케이스를 연결하는 연관 관계의 표기법은?",
+  o:["실선","점선 화살표 + «include»","속이 빈 삼각형 화살표","이중선"],
+  a:0, e:"액터와 유스케이스는 단순한 실선으로 연결합니다."},
+ {q:"8. 유스케이스 명세서에서 '유스케이스가 시작되기 전에 갖춰져 있어야 할 조건'을 뜻하는 것은?",
+  o:["사후 조건","기본 흐름","대체 흐름","사전 조건"],
+  a:3, e:"사전 조건(Precondition)은 시작 전 조건, 사후 조건(Postcondition)은 끝난 뒤의 상태입니다."},
+ {q:"9. [복습] UML 다이어그램 중 행위(동적) 다이어그램에 속하지 않는 것은?",
+  o:["유스케이스 다이어그램","클래스 다이어그램","시퀀스 다이어그램","활동 다이어그램"],
+  a:1, e:"클래스 다이어그램은 시스템의 뼈대를 그리는 구조(정적) 다이어그램입니다."},
+ {q:"10. [복습] UML의 사물과 사물을 잇는 '관계'에 해당하지 않는 것은?",
+  o:["연관 관계","일반화 관계","컴파일 관계","의존 관계"],
+  a:2, e:"UML의 관계에는 연관·집합·합성·일반화·의존·실체화 등이 있어요. '컴파일 관계'는 없습니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

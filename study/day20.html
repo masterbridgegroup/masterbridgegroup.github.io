@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 20 · 응집도 — 모듈 안은 똘똘 뭉칠수록 좋다</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 20 · 1과목 소프트웨어 설계</span>
+    <h1>응집도 — 모듈 안은 똘똘 뭉칠수록 좋다</h1>
+    <p>2026-07-23 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제 결합도 6단계를 배웠어요. 낮은(좋은) 것부터 <b>"자스제외공내"</b> — 자료·스탬프·제어·외부·공통·내용이었죠. 가장 좋은 건 필요한 값만 주고받는 <b>자료 결합도</b>, 가장 나쁜 건 남의 모듈 내부를 직접 건드리는 <b>내용 결합도</b>였습니다. 오늘은 그 짝꿍인 <b>응집도</b> 차례예요.</p>
+  </section>
+
+  <section>
+    <h2>1. 응집도란?</h2>
+    <p><b>응집도(Cohesion)</b>는 <b>모듈 하나 안의 요소들이 서로 얼마나 밀접하게 관련되어 있는가</b>의 정도예요. 결합도와 반대로 <b>높을수록 좋은 설계</b>입니다.</p>
+    <div class="easy"><b>비유</b> — 서랍 정리예요. '양말 서랍'에 양말만 들어 있으면 응집도가 높은 것(찾기 쉬움), 양말·영수증·건전지·과자가 섞여 있으면 응집도가 낮은 것이죠.</div>
+    <p>기억하세요: <b>결합도는 낮게(모듈 사이는 느슨하게), 응집도는 높게(모듈 안은 단단하게)</b>!</p>
+    <div class="point"><b>시험 포인트</b> — 결합도와 응집도의 방향(낮게 vs 높게)을 바꿔치기한 오답이 자주 나와요. 헷갈리지 마세요!</div>
+  </section>
+
+  <section>
+    <h2>2. 응집도 7단계 한눈에 보기</h2>
+    <p>낮음(나쁨) → 높음(좋음) 순서:</p>
+    <table>
+      <tr><th>순서</th><th>이름</th><th>핵심</th></tr>
+      <tr><td>1 (가장 나쁨)</td><td><b>우연적</b> 응집도</td><td>아무 관련 없는 기능들이 한 모듈에</td></tr>
+      <tr><td>2</td><td><b>논리적</b> 응집도</td><td>비슷한 성격의 기능들을 묶어 놓고 골라 씀</td></tr>
+      <tr><td>3</td><td><b>시간적</b> 응집도</td><td>같은 시간에 실행되는 기능끼리 묶음</td></tr>
+      <tr><td>4</td><td><b>절차적</b> 응집도</td><td>정해진 순서대로 실행되는 기능끼리 묶음</td></tr>
+      <tr><td>5</td><td><b>교환적(통신적)</b> 응집도</td><td>같은 데이터를 사용하는 기능끼리 묶음</td></tr>
+      <tr><td>6</td><td><b>순차적</b> 응집도</td><td>한 기능의 출력이 다음 기능의 입력이 됨</td></tr>
+      <tr><td>7 (가장 좋음)</td><td><b>기능적</b> 응집도</td><td>모듈이 단 하나의 기능만 수행</td></tr>
+    </table>
+    <div class="easy"><b>암기법</b> — 나쁜 것부터 "<b>우논시절 교순기</b>" (우·논·시·절·교·순·기). "우는 논에서 시절 좋게 교순기(경운기)를 몬다"로 외워보세요!</div>
+    <div class="point"><b>시험 포인트</b> — 결합도처럼 응집도도 <b>순서 나열 문제</b>가 단골! 가장 좋은 것 = 기능적, 가장 나쁜 것 = 우연적.</div>
+  </section>
+
+  <section>
+    <h2>3. 나쁜 응집 — 우연적·논리적·시간적</h2>
+    <p><b>우연적 응집도</b>: 서로 아무 관련 없는 기능들이 우연히 한 모듈에 들어 있어요. 예: '로그인 + 급여 계산 + 이미지 압축'이 한 모듈에.</p>
+    <p><b>논리적 응집도</b>: 성격이 비슷한 기능들을 한 모듈에 묶어 두고, 호출할 때 <b>어떤 걸 쓸지 골라서</b> 사용해요. 예: 모든 종류의 '출력 기능'을 한 모듈에 묶고 번호로 선택.</p>
+    <p><b>시간적 응집도</b>: 기능들이 관련은 없지만 <b>같은 시간대에 실행</b>된다는 이유로 묶여 있어요. 예: 프로그램 시작 시 실행되는 '초기화 모듈'(변수 초기화 + 파일 열기 + 화면 표시).</p>
+    <div class="easy"><b>비유</b> — 우연적은 '잡동사니 서랍', 논리적은 '필기구 서랍(연필·볼펜·형광펜 중 골라 씀)', 시간적은 '아침에 쓰는 것 서랍(칫솔+커피+신문이 같이)'이에요.</div>
+    <div class="point"><b>시험 포인트</b> — "초기화 모듈"이 예시로 나오면 <b>시간적 응집도</b>입니다!</div>
+  </section>
+
+  <section>
+    <h2>4. 좋은 응집 — 절차적·교환적·순차적·기능적</h2>
+    <p><b>절차적 응집도</b>: 기능들이 <b>정해진 순서대로</b> 차례차례 실행돼요. (데이터를 주고받지는 않음)</p>
+    <p><b>교환적(통신적) 응집도</b>: 기능들이 <b>같은 입력 데이터</b>를 사용하거나 같은 출력을 만들어요.</p>
+    <p><b>순차적 응집도</b>: 한 기능의 <b>출력(결과)이 다음 기능의 입력</b>으로 바로 이어져요. 예: '파일 읽기 → 읽은 내용 정렬'.</p>
+    <p><b>기능적 응집도</b>: 모듈 안의 모든 요소가 <b>단 하나의 기능</b>을 위해 존재해요. 가장 이상적! 예: '제곱근 계산' 모듈.</p>
+    <div class="easy"><b>비유</b> — 순차적은 요리 릴레이예요. 손질한 재료(1번 출력)를 그대로 프라이팬(2번 입력)에 넣죠. 기능적은 '계란만 완벽하게 삶는 계란 삶기 전용 기계'예요.</div>
+    <div class="point"><b>시험 포인트</b> — <b>"출력이 다음 입력으로" = 순차적</b>, <b>"같은 데이터 사용" = 교환적</b>, <b>"단일 기능" = 기능적</b>. 이 세 개 구분이 자주 출제!</div>
+  </section>
+
+  <section>
+    <h2>5. 결합도·응집도 총정리</h2>
+    <table>
+      <tr><th></th><th>결합도</th><th>응집도</th></tr>
+      <tr><td>무엇을 잼?</td><td>모듈 <b>사이</b>의 의존 정도</td><td>모듈 <b>안</b>의 관련 정도</td></tr>
+      <tr><td>좋은 방향</td><td><b>낮을수록</b> 좋음</td><td><b>높을수록</b> 좋음</td></tr>
+      <tr><td>가장 좋은 것</td><td>자료 결합도</td><td>기능적 응집도</td></tr>
+      <tr><td>가장 나쁜 것</td><td>내용 결합도</td><td>우연적 응집도</td></tr>
+      <tr><td>암기</td><td>자스제외공내 (좋음→나쁨)</td><td>우논시절교순기 (나쁨→좋음)</td></tr>
+    </table>
+    <div class="easy"><b>한 줄 요약</b> — 이상적인 모듈 = <b>자료 결합도 + 기능적 응집도</b>. 필요한 값만 주고받고, 자기 일 하나만 똑부러지게 하는 모듈!</div>
+    <div class="point"><b>시험 포인트</b> — "가장 바람직한 결합도와 응집도의 조합은?" → 자료 결합도 + 기능적 응집도.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 응집도(Cohesion)에 대한 설명으로 옳은 것은?",
+  o:["모듈 사이의 의존 정도로, 낮을수록 좋다","모듈 내부 요소들의 관련 정도로, 높을수록 좋다","모듈 내부 요소들의 관련 정도로, 낮을수록 좋다","모듈의 개수를 뜻한다"],
+  a:1, e:"응집도 = 모듈 '안'의 뭉침 정도. 높을수록 좋습니다. (결합도는 '사이', 낮을수록 좋음)"},
+ {q:"2. 응집도를 낮은 것부터 높은 것 순서로 올바르게 나열한 것은?",
+  o:["기능적 → 순차적 → 교환적 → 절차적 → 시간적 → 논리적 → 우연적","우연적 → 시간적 → 논리적 → 절차적 → 교환적 → 순차적 → 기능적","우연적 → 논리적 → 시간적 → 절차적 → 교환적 → 순차적 → 기능적","논리적 → 우연적 → 시간적 → 교환적 → 절차적 → 기능적 → 순차적"],
+  a:2, e:"'우논시절 교순기'! 우연적-논리적-시간적-절차적-교환적-순차적-기능적 순으로 좋아집니다."},
+ {q:"3. 모듈 안의 모든 요소가 단 하나의 기능을 위해 존재하는 가장 이상적인 응집도는?",
+  o:["기능적 응집도","순차적 응집도","논리적 응집도","시간적 응집도"],
+  a:0, e:"단일 기능만 수행 = 기능적 응집도. 가장 높고 가장 좋습니다."},
+ {q:"4. 한 기능의 출력이 다음 기능의 입력으로 바로 이어지는 응집도는?",
+  o:["교환적 응집도","절차적 응집도","우연적 응집도","순차적 응집도"],
+  a:3, e:"'출력 → 다음 입력'의 릴레이 = 순차적 응집도. 기능적 다음으로 좋아요."},
+ {q:"5. 프로그램 시작 시 실행되는 '초기화 모듈'처럼 같은 시간대에 실행되는 기능끼리 묶인 응집도는?",
+  o:["논리적 응집도","시간적 응집도","기능적 응집도","교환적 응집도"],
+  a:1, e:"'초기화 모듈' 예시가 나오면 시간적 응집도입니다."},
+ {q:"6. 서로 아무 관련 없는 기능들이 한 모듈에 모여 있는 가장 나쁜 응집도는?",
+  o:["절차적 응집도","시간적 응집도","우연적 응집도","순차적 응집도"],
+  a:2, e:"잡동사니 서랍 = 우연적 응집도. 가장 낮고 가장 나쁩니다."},
+ {q:"7. 같은 입력 데이터를 사용하는 기능들끼리 묶인 응집도는?",
+  o:["교환적(통신적) 응집도","논리적 응집도","우연적 응집도","기능적 응집도"],
+  a:0, e:"'같은 데이터 사용' = 교환적(통신적) 응집도입니다."},
+ {q:"8. 가장 바람직한 결합도와 응집도의 조합은?",
+  o:["내용 결합도 + 우연적 응집도","공통 결합도 + 논리적 응집도","자료 결합도 + 기능적 응집도","제어 결합도 + 순차적 응집도"],
+  a:2, e:"이상적인 모듈 = 자료 결합도(필요한 값만) + 기능적 응집도(한 가지 일만)."},
+ {q:"9. [복습] 결합도를 낮은 것부터 나열할 때 세 번째에 오는 것은?",
+  o:["스탬프 결합도","제어 결합도","외부 결합도","공통 결합도"],
+  a:1, e:"자스제외공내 — 자료(1), 스탬프(2), 제어(3), 외부(4), 공통(5), 내용(6)."},
+ {q:"10. [복습] 여러 모듈이 전역 변수를 함께 읽고 쓸 때 생기는 결합도는?",
+  o:["자료 결합도","스탬프 결합도","내용 결합도","공통 결합도"],
+  a:3, e:"전역 변수(공용 데이터) 공유 = 공통 결합도. 공용 지갑 비유였죠!"}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>
