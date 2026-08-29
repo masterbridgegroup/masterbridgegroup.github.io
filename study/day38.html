@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 38 · 트리 — 거꾸로 자라는 나무</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 38 · 2과목 소프트웨어 개발</span>
+    <h1>트리 — 거꾸로 자라는 나무</h1>
+    <p>2026-08-10 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 37)는 스택과 큐를 배웠어요. 딱 하나만 다시: <b>스택은 LIFO(나중 것 먼저), 큐는 FIFO(먼저 온 것 먼저)</b>! 접시 쌓기와 은행 줄서기였죠. 오늘은 드디어 비선형 구조의 대표, <b>트리</b>를 만납니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 트리(Tree)란? — 가지를 치는 비선형 구조</h2>
+    <p><b>트리</b>는 데이터(노드)들이 <b>부모-자식 관계로 가지를 치며</b> 연결된 비선형 구조예요. 나무를 거꾸로 세운 모양이라 맨 위가 뿌리(루트)입니다.</p>
+    <div class="easy"><b>비유</b> — 회사 조직도! 사장(루트) 아래 부서장, 그 아래 팀원... 컴퓨터의 폴더 구조도 트리예요. 중요한 규칙: <b>사이클(빙 돌아 제자리로 오는 길)이 없다</b>는 것!</div>
+    <table>
+      <tr><th>용어</th><th>뜻</th></tr>
+      <tr><td>루트(root)</td><td>맨 위의 시작 노드 (사장님)</td></tr>
+      <tr><td>단말 노드(leaf, 리프)</td><td>자식이 하나도 없는 끝 노드 (잎사귀)</td></tr>
+      <tr><td>차수(degree)</td><td>한 노드가 가진 <b>자식의 수</b></td></tr>
+      <tr><td>트리의 차수</td><td>노드 차수 중 <b>가장 큰 값</b></td></tr>
+      <tr><td>깊이(depth)/레벨</td><td>루트에서 몇 층 내려왔는지</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 그림을 주고 "트리의 차수는?", "단말 노드의 수는?"을 묻는 계산 문제가 매년 나와요. 차수 = 자식 수, 단말 = 자식 없는 노드만 세면 됩니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 이진 트리 — 자식이 최대 2명</h2>
+    <p><b>이진 트리</b>(binary tree)는 모든 노드의 <b>자식이 최대 2개(왼쪽·오른쪽)</b>인 트리예요. 컴퓨터가 다루기 쉬워 가장 널리 쓰입니다.</p>
+    <table>
+      <tr><th>종류</th><th>모양</th></tr>
+      <tr><td><b>포화</b> 이진 트리</td><td>모든 층이 빈틈없이 꽉 참 (완벽한 피라미드)</td></tr>
+      <tr><td><b>완전</b> 이진 트리</td><td>마지막 층만 왼쪽부터 차례로 채워짐 (공연장 좌석을 앞줄부터, 왼쪽부터 채운 모양)</td></tr>
+      <tr><td><b>편향</b> 트리</td><td>한쪽으로만 자식이 이어짐 (사실상 한 줄, 지팡이 모양)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 이진 트리에서 <b>레벨 k(루트가 레벨 1)의 최대 노드 수는 2ᵏ⁻¹개</b>예요. 레벨 3이면 최대 4개! 이 공식이 자주 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 트리 순회 ① — 전위·중위·후위가 뭐길래</h2>
+    <p><b>순회</b>(traversal)는 트리의 모든 노드를 <b>빠짐없이 한 번씩 방문하는 순서 규칙</b>이에요. 부모(Root)를 언제 방문하느냐로 이름이 정해집니다.</p>
+    <table>
+      <tr><th>순회</th><th>순서</th><th>기억법</th></tr>
+      <tr><td><b>전위</b>(Preorder)</td><td><b>Root</b> → 왼쪽 → 오른쪽</td><td>부모 먼저 (전 = 앞)</td></tr>
+      <tr><td><b>중위</b>(Inorder)</td><td>왼쪽 → <b>Root</b> → 오른쪽</td><td>부모 가운데 (중 = 중간)</td></tr>
+      <tr><td><b>후위</b>(Postorder)</td><td>왼쪽 → 오른쪽 → <b>Root</b></td><td>부모 나중 (후 = 뒤)</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 부모님과 두 아이가 식당에 갔을 때 누가 먼저 주문하나: 전위는 부모 먼저, 중위는 첫째-부모-둘째, 후위는 아이들 먼저 부모 마지막. Root의 위치만 기억하면 끝!</div>
+  </section>
+
+  <section>
+    <h2>4. 트리 순회 ② — 직접 해보기</h2>
+    <p>루트가 A, A의 왼쪽 자식이 B, 오른쪽 자식이 C이고, B 밑에 D와 E가 있는 트리로 연습해 볼게요.</p>
+    <table>
+      <tr><th>순회</th><th>과정</th><th>결과</th></tr>
+      <tr><td>전위</td><td>A 방문 → B 서브트리(B→D→E) → C</td><td><b>A B D E C</b></td></tr>
+      <tr><td>중위</td><td>B 서브트리(D→B→E) → A → C</td><td><b>D B E A C</b></td></tr>
+      <tr><td>후위</td><td>B 서브트리(D→E→B) → C → A</td><td><b>D E B C A</b></td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 순회 문제는 그림만 주면 무조건 풀 수 있는 점수 문제예요. 왼쪽 서브트리(부분 나무) 전체를 하나의 덩어리로 보고 재귀적으로(같은 규칙을 반복해서) 적용하는 게 요령입니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 수식 표기법 — 순회로 수식 바꾸기</h2>
+    <p>연산자(+, × 같은 기호)를 어디에 쓰느냐에 따라 수식 표기법이 세 가지예요. 사실 트리 순회와 같은 원리입니다.</p>
+    <table>
+      <tr><th>표기법</th><th>예 (A+B)</th><th>대응 순회</th></tr>
+      <tr><td>전위 표기(Prefix)</td><td>+AB</td><td>전위 순회</td></tr>
+      <tr><td>중위 표기(Infix)</td><td>A+B (우리가 평소 쓰는 것)</td><td>중위 순회</td></tr>
+      <tr><td>후위 표기(Postfix)</td><td>AB+</td><td>후위 순회</td></tr>
+    </table>
+    <div class="easy"><b>변환 요령</b> — A+B×C를 후위로: 먼저 계산 순서대로 괄호를 치고 (A+(B×C)) → 연산자를 각 괄호 뒤로 보내면 → A B C × + 완성! 컴퓨터는 괄호가 필요 없는 후위 표기를 스택으로 계산해요.</div>
+    <div class="point"><b>시험 포인트</b> — "중위 표기 → 후위 표기 변환"이 최다 출제예요. 괄호 치고 → 연산자를 괄호 뒤로, 이 2단계만 기억하세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 트리에서 자식이 하나도 없는 노드를 부르는 이름은?",
+  o:["루트 노드","단말(리프) 노드","부모 노드","형제 노드"],
+  a:1, e:"잎사귀(leaf)처럼 가지 끝에 달린, 자식 없는 노드 = 단말 노드입니다."},
+ {q:"2. 트리에서 '차수(degree)'란 무엇인가?",
+  o:["노드가 가진 자식의 수","루트에서의 거리","전체 노드의 수","트리의 층 수"],
+  a:0, e:"차수 = 자식 수. '트리의 차수'는 그중 가장 큰 값입니다."},
+ {q:"3. 어떤 노드의 차수가 3, 다른 노드들의 차수가 2, 1, 0일 때 이 트리의 차수는?",
+  o:["0","1","2","3"],
+  a:3, e:"트리의 차수는 모든 노드의 차수 중 최댓값이므로 3입니다."},
+ {q:"4. 모든 노드의 자식이 최대 2개인 트리는?",
+  o:["편향 트리","이진 트리","B-트리","신장 트리"],
+  a:1, e:"이진(binary, 2개의) 트리 = 자식이 최대 왼쪽·오른쪽 2개인 트리입니다."},
+ {q:"5. 이진 트리에서 레벨 3(루트가 레벨 1)에 올 수 있는 최대 노드 수는?",
+  o:["2개","3개","4개","8개"],
+  a:2, e:"레벨 k의 최대 노드 수 = 2ᵏ⁻¹. 레벨 3이면 2² = 4개입니다."},
+ {q:"6. 마지막 레벨을 제외한 모든 레벨이 꽉 차 있고, 마지막 레벨은 왼쪽부터 채워진 트리는?",
+  o:["완전 이진 트리","포화 이진 트리","편향 트리","균형 트리"],
+  a:0, e:"공연장 좌석을 앞줄부터·왼쪽부터 채운 모양 = 완전 이진 트리. 전부 꽉 차면 포화입니다."},
+ {q:"7. 트리 순회 중 '왼쪽 → Root → 오른쪽' 순서로 방문하는 것은?",
+  o:["전위 순회","후위 순회","중위 순회","레벨 순회"],
+  a:2, e:"Root가 가운데(중간)에 오면 중위(Inorder) 순회입니다."},
+ {q:"8. 루트 A, A의 자식 B·C, B의 자식 D·E인 트리를 전위 순회한 결과는?",
+  o:["D B E A C","A B D E C","D E B C A","A C B E D"],
+  a:1, e:"전위 = Root 먼저! A → B → D → E → C. (중위는 D B E A C, 후위는 D E B C A)"},
+ {q:"9. 중위 표기식 A+B×C를 후위 표기(Postfix)로 바꾼 것은?",
+  o:["ABC×+","AB+C×","×+ABC","ABC+×"],
+  a:0, e:"×가 먼저이므로 (A+(B×C)) → 연산자를 괄호 뒤로 → A BC× + = ABC×+ 입니다."},
+ {q:"10. (복습) 운영체제의 작업 스케줄링, 프린터 인쇄 대기열에 사용되는 FIFO 구조는?",
+  o:["스택","큐","트리","데크"],
+  a:1, e:"어제 배운 큐! 먼저 온 작업부터 순서대로 처리하는 선입선출 구조입니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

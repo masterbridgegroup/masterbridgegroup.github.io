@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 37 · 스택과 큐 — 쌓기와 줄서기</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 37 · 2과목 소프트웨어 개발</span>
+    <h1>스택과 큐 — 쌓기와 줄서기</h1>
+    <p>2026-08-09 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 36)는 배열과 연결 리스트를 배웠어요. 딱 하나만 다시: <b>배열은 접근이 빠르지만 삽입·삭제가 느리고, 연결 리스트는 그 반대</b>였죠. 오늘 배울 스택과 큐는 이 리스트에 <b>"넣고 빼는 규칙"</b>을 정해 놓은 특별한 선형 구조입니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 스택 (Stack) — 접시 쌓기, 나중에 온 게 먼저 나간다</h2>
+    <p><b>스택</b>은 <b>한쪽 끝(top)에서만 넣고 뺄 수 있는</b> 구조예요. 그래서 <b>나중에 넣은 것이 먼저 나옵니다</b>. 이를 <b>LIFO</b>(Last In First Out, 후입선출)라고 해요.</p>
+    <div class="easy"><b>비유</b> — 설거지한 접시 쌓기! 맨 위에 올린 접시(나중에 넣은 것)를 맨 먼저 꺼내 쓰죠. 맨 아래 접시를 꺼내려면 위를 다 들어내야 해요.</div>
+    <p>용어: 넣기 = <b>push</b>(푸시), 꺼내기 = <b>pop</b>(팝), 꺼낼 게 없는데 pop하면 <b>언더플로우</b>, 꽉 찼는데 push하면 <b>오버플로우</b>가 발생해요.</p>
+    <div class="point"><b>시험 포인트</b> — LIFO = 스택. "A, B, C 순서로 push 후 pop을 2번 하면?" → C, B가 나옵니다(나중 것부터).</div>
+  </section>
+
+  <section>
+    <h2>2. 스택은 어디에 쓰일까?</h2>
+    <p>스택의 활용처는 시험 단골이에요. 공통점은 <b>"가장 최근 것으로 되돌아가기"</b>입니다.</p>
+    <table>
+      <tr><th>활용처</th><th>왜 스택?</th></tr>
+      <tr><td>함수 호출 관리</td><td>가장 나중에 호출된 함수가 먼저 끝나고 되돌아감</td></tr>
+      <tr><td>웹 브라우저 '뒤로 가기'</td><td>가장 최근에 본 페이지부터 되돌아감</td></tr>
+      <tr><td>실행 취소(Ctrl+Z)</td><td>가장 최근 작업부터 취소</td></tr>
+      <tr><td>수식 계산(후위 표기법), 재귀 호출</td><td>계산 순서를 쌓아 두었다가 역순 처리</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "스택의 응용 분야가 아닌 것은?" 문제에서 <b>운영체제의 작업 스케줄링(줄 선 순서 처리)은 큐</b>의 응용이라는 게 함정으로 나와요.</div>
+  </section>
+
+  <section>
+    <h2>3. 큐 (Queue) — 은행 줄서기, 먼저 온 게 먼저 나간다</h2>
+    <p><b>큐</b>는 <b>뒤(rear)로 넣고 앞(front)으로 빼는</b> 구조예요. <b>먼저 넣은 것이 먼저 나옵니다</b>. 이를 <b>FIFO</b>(First In First Out, 선입선출)라고 해요.</p>
+    <div class="easy"><b>비유</b> — 은행 번호표 줄서기! 먼저 온 손님이 먼저 처리되고, 새 손님은 줄 맨 뒤에 서죠. 새치기(중간 삽입)는 없습니다.</div>
+    <p>활용처: <b>프린터 인쇄 대기열</b>(먼저 보낸 문서부터 인쇄), <b>운영체제 작업 스케줄링</b>, 메시지 대기열 등 "순서대로 처리"가 필요한 곳이에요.</p>
+    <div class="point"><b>시험 포인트</b> — FIFO = 큐. 스택은 삽입·삭제가 같은 쪽(top), 큐는 <b>삽입(rear)과 삭제(front)가 반대쪽</b>이라는 것도 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 원형 큐 — 줄의 끝과 처음을 이어 붙인 큐</h2>
+    <p>일반(선형) 큐는 앞에서 빼고 뒤로 넣다 보면 <b>앞쪽 공간이 비었는데도 꽉 찬 것처럼 보이는 낭비</b>가 생겨요. 그래서 <b>끝과 처음을 원처럼 이어 붙인 원형 큐</b>가 나왔습니다.</p>
+    <div class="easy"><b>비유</b> — 회전초밥 레일! 접시가 레일 끝에 가면 다시 처음으로 돌아오니까 빈자리를 계속 재사용할 수 있어요.</div>
+    <div class="point"><b>시험 포인트</b> — 원형 큐의 존재 이유 = <b>선형 큐의 공간 낭비 문제 해결</b>. 이 한 줄이 답입니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 데크 (Deque) — 양쪽 다 되는 만능 줄</h2>
+    <p><b>데크</b>(Deque, Double-Ended Queue)는 <b>양쪽 끝 모두에서 삽입과 삭제가 가능한</b> 구조예요. 스택처럼도, 큐처럼도 쓸 수 있는 만능형입니다.</p>
+    <div class="easy"><b>비유</b> — 양쪽 문이 다 열리는 지하철 칸. 어느 쪽으로든 타고 내릴 수 있어요.</div>
+    <table>
+      <tr><th>구조</th><th>규칙</th><th>키워드</th></tr>
+      <tr><td>스택</td><td>한쪽에서만 넣고 뺌</td><td>LIFO (후입선출)</td></tr>
+      <tr><td>큐</td><td>뒤로 넣고 앞으로 뺌</td><td>FIFO (선입선출)</td></tr>
+      <tr><td>데크</td><td>양쪽 모두 넣고 뺌</td><td>스택+큐 만능형</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 데크 = "양쪽 끝에서 삽입·삭제 모두 가능". 이 문구가 그대로 보기로 나옵니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 나중에 삽입된 데이터가 먼저 삭제되는 LIFO(후입선출) 구조는?",
+  o:["큐","스택","데크","그래프"],
+  a:1, e:"접시 쌓기처럼 맨 위(나중 것)부터 꺼내는 구조 = 스택(LIFO)입니다."},
+ {q:"2. 스택에 데이터를 넣는 연산과 꺼내는 연산을 순서대로 짝지은 것은?",
+  o:["pop, push","insert, delete","push, pop","enqueue, dequeue"],
+  a:2, e:"넣기 = push, 꺼내기 = pop. enqueue/dequeue는 큐의 용어입니다."},
+ {q:"3. 스택에 A, B, C를 차례로 push한 뒤 pop을 두 번 하면 나오는 순서는?",
+  o:["A, B","C, B","A, C","B, A"],
+  a:1, e:"나중에 넣은 것부터! C가 먼저, 그다음 B가 나옵니다."},
+ {q:"4. 비어 있는 스택에서 pop을 시도할 때 발생하는 것은?",
+  o:["오버플로우","언더플로우","데드락","인터럽트"],
+  a:1, e:"꺼낼 게 없는데 꺼내면 언더플로우(밑으로 넘침), 꽉 찼는데 넣으면 오버플로우입니다."},
+ {q:"5. 다음 중 스택의 응용 분야가 아닌 것은?",
+  o:["함수 호출 관리","웹 브라우저 뒤로 가기","운영체제의 작업 스케줄링","실행 취소(Ctrl+Z)"],
+  a:2, e:"작업 스케줄링은 먼저 온 것부터 순서대로 처리하는 큐의 응용입니다. 단골 함정!"},
+ {q:"6. 먼저 삽입된 데이터가 먼저 삭제되는 FIFO(선입선출) 구조는?",
+  o:["큐","스택","트리","힙"],
+  a:0, e:"은행 줄서기처럼 먼저 온 순서대로 처리 = 큐(FIFO)입니다."},
+ {q:"7. 큐에서 데이터가 삽입되는 곳과 삭제되는 곳을 순서대로 짝지은 것은?",
+  o:["front, rear","rear, front","top, bottom","양쪽 끝, 양쪽 끝"],
+  a:1, e:"뒤(rear)로 줄을 서고 앞(front)에서 빠져나갑니다. 스택과 달리 넣는 곳과 빼는 곳이 달라요."},
+ {q:"8. 선형 큐의 공간 낭비 문제를 해결하기 위해 끝과 처음을 이어 붙인 구조는?",
+  o:["데크","연결 리스트","이중 스택","원형 큐"],
+  a:3, e:"회전초밥 레일처럼 빈자리를 재사용하는 원형 큐입니다."},
+ {q:"9. 양쪽 끝에서 삽입과 삭제가 모두 가능한 자료구조는?",
+  o:["스택","선형 큐","데크","배열"],
+  a:2, e:"데크(Deque) = Double-Ended Queue, 양쪽 문이 다 열리는 만능형입니다."},
+ {q:"10. (복습) 삽입·삭제는 빠르지만 특정 위치 접근이 느리고, 포인터용 추가 공간이 필요한 자료구조는?",
+  o:["배열","연결 리스트","원형 큐","데크"],
+  a:1, e:"어제 배운 연결 리스트! 포인터만 바꾸면 삽입·삭제 끝, 대신 찾기는 처음부터 순서대로였죠."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

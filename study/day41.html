@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 41 · 정렬 알고리즘 ② — 퀵·합병·힙</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 41 · 2과목 소프트웨어 개발</span>
+    <h1>정렬 알고리즘 ② — 퀵·합병·힙</h1>
+    <p>2026-08-13 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 40)는 O(n²)의 단순 정렬 3형제를 배웠어요. 딱 하나만 다시: <b>버블은 1회전 후 최댓값이 맨 뒤, 선택은 최솟값이 맨 앞</b>에 확정! 오늘은 훨씬 빠른 O(n log n)급 고급 정렬 3형제를 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 분할 정복 — 고급 정렬의 공통 전략</h2>
+    <p>오늘 배울 퀵·합병 정렬의 공통 전략은 <b>분할 정복</b>(Divide and Conquer)이에요. 큰 문제를 <b>작게 쪼개고(분할), 각각 해결한 뒤(정복), 합치는(결합)</b> 방식입니다.</p>
+    <div class="easy"><b>비유</b> — 두꺼운 문제집 한 권을 혼자 다 풀기 힘드니, 반으로 나눠 친구와 각자 풀고 답을 합치는 것! 쪼갤수록 각 조각은 쉬워져요.</div>
+    <div class="point"><b>시험 포인트</b> — "분할 정복 기법을 사용하는 정렬은?" → 퀵 정렬, 합병 정렬. 둘 다 답이 될 수 있게 기억하세요.</div>
+  </section>
+
+  <section>
+    <h2>2. 퀵 정렬 (Quick Sort) — 기준(피벗)으로 편 가르기</h2>
+    <p><b>퀵 정렬</b>은 기준 값인 <b>피벗</b>(pivot)을 하나 정해서, <b>피벗보다 작은 값은 왼쪽, 큰 값은 오른쪽</b>으로 나눈 뒤 각 묶음을 또 같은 방법으로 정렬해요.</p>
+    <div class="easy"><b>비유</b> — 키 기준 한 명(피벗)을 세우고 "이 친구보다 작으면 왼쪽, 크면 오른쪽!" 하고 편을 가른 다음, 각 편에서 또 기준을 세워 반복하는 거예요.</div>
+    <p>평균은 <b>O(n log n)</b>으로 매우 빠르지만, 이미 정렬된 데이터에 피벗을 잘못 잡으면 편이 한쪽으로만 쏠려 <b>최악의 경우 O(n²)</b>이 됩니다.</p>
+    <div class="point"><b>시험 포인트</b> — 키워드 <b>피벗 = 퀵 정렬</b>. 그리고 "퀵 정렬의 최악 시간 복잡도는 O(n²)"가 함정 문제로 자주 나와요(평균만 알면 틀리기 쉬움).</div>
+  </section>
+
+  <section>
+    <h2>3. 합병 정렬 (Merge Sort) — 반씩 나눴다 합치며 정렬</h2>
+    <p><b>합병 정렬</b>은 데이터를 <b>더 나눌 수 없을 때까지 반씩 나눈 뒤</b>, 두 묶음씩 <b>크기 순서를 맞춰 가며 다시 합치는</b> 정렬이에요.</p>
+    <div class="easy"><b>비유</b> — 카드 더미를 한 장씩 될 때까지 나눈 다음, 두 더미씩 작은 카드부터 차례로 합쳐요. 정렬된 두 더미를 합치는 건 맨 위끼리만 비교하면 되니 쉽죠!</div>
+    <p>장점: 어떤 데이터가 와도 <b>항상 O(n log n)</b>을 보장(최악도 같음). 단점: 합칠 때 쓸 <b>추가 메모리 공간</b>이 필요해요.</p>
+    <div class="point"><b>시험 포인트</b> — 합병 정렬 = <b>항상 O(n log n) 보장 + 추가 공간 필요</b>. 퀵(최악 O(n²), 추가 공간 거의 불필요)과 대비되는 특징입니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 힙 정렬 (Heap Sort) — 우승자 뽑기 토너먼트</h2>
+    <p><b>힙</b>(heap)은 부모가 자식보다 항상 크거나(최대 힙) 작은(최소 힙) <b>완전 이진 트리</b>예요. <b>힙 정렬</b>은 데이터를 힙으로 만든 뒤, <b>루트(최댓값 또는 최솟값)를 하나씩 꺼내며</b> 정렬합니다.</p>
+    <div class="easy"><b>비유</b> — 토너먼트 대진표! 결승(루트)에는 항상 우승자(최댓값)가 있어요. 우승자를 빼내고 대진표를 다시 정리하면 다음 우승자가 올라오고... 이걸 반복하면 순위표(정렬)가 완성되죠.</div>
+    <p>시간 복잡도는 최선·평균·최악 <b>모두 O(n log n)</b>이에요.</p>
+    <div class="point"><b>시험 포인트</b> — 힙 정렬의 재료는 Day 38에 배운 <b>완전 이진 트리</b>! "완전 이진 트리를 이용하는 정렬은?" → 힙 정렬입니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 이번 주 마무리 — 정렬 성적표 총정리</h2>
+    <table>
+      <tr><th>정렬</th><th>평균</th><th>최악</th><th>키워드</th></tr>
+      <tr><td>버블</td><td>O(n²)</td><td>O(n²)</td><td>이웃 교환, 최댓값 뒤로</td></tr>
+      <tr><td>선택</td><td>O(n²)</td><td>O(n²)</td><td>최솟값 선택, 앞으로</td></tr>
+      <tr><td>삽입</td><td>O(n²)</td><td>O(n²)</td><td>끼워 넣기, 정렬된 자료에 최적(최선 O(n))</td></tr>
+      <tr><td>퀵</td><td>O(n log n)</td><td><b>O(n²)</b></td><td>피벗, 분할 정복</td></tr>
+      <tr><td>합병</td><td>O(n log n)</td><td>O(n log n)</td><td>반씩 나눠 합침, 추가 공간</td></tr>
+      <tr><td>힙</td><td>O(n log n)</td><td>O(n log n)</td><td>완전 이진 트리</td></tr>
+    </table>
+    <div class="easy"><b>이번 주 정리</b> — 리스트(배열·연결)→스택·큐→트리→그래프→정렬까지, 자료구조의 큰 그림을 완주했어요! 내일(Day 42)은 이번 주 전체 복습 + 종합 테스트입니다.</div>
+    <div class="point"><b>시험 포인트</b> — 이 표에서 최악이 O(n²)인 유일한 O(n log n)급 정렬 = <b>퀵</b>. 최악까지 O(n log n) 보장 = <b>합병·힙</b>. 이 구분이 최다 출제!</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 큰 문제를 작게 쪼개 각각 해결한 뒤 합치는 알고리즘 전략은?",
+  o:["탐욕법","분할 정복","동적 계획법","백트래킹"],
+  a:1, e:"나누고(분할) 해결하고(정복) 합치기 — 퀵·합병 정렬의 공통 전략입니다."},
+ {q:"2. 피벗(기준 값)을 정해 작은 값은 왼쪽, 큰 값은 오른쪽으로 나누며 정렬하는 방식은?",
+  o:["힙 정렬","합병 정렬","퀵 정렬","삽입 정렬"],
+  a:2, e:"피벗이라는 단어가 보이면 무조건 퀵 정렬입니다."},
+ {q:"3. 퀵 정렬의 최악의 경우 시간 복잡도는?",
+  o:["O(n²)","O(n log n)","O(log n)","O(n)"],
+  a:0, e:"평균은 O(n log n)이지만 피벗이 치우치면 최악 O(n²)! 단골 함정 문제입니다."},
+ {q:"4. 데이터를 반씩 나눈 뒤 순서를 맞춰 가며 다시 합치는 정렬은?",
+  o:["선택 정렬","합병 정렬","버블 정렬","퀵 정렬"],
+  a:1, e:"합병(merge, 합치기) 정렬 — 한 장씩 나눴다 두 더미씩 합칩니다."},
+ {q:"5. 합병 정렬의 단점으로 알맞은 것은?",
+  o:["최악의 경우 O(n²)가 된다","정렬 결과가 부정확하다","합치는 과정에서 추가 메모리 공간이 필요하다","이미 정렬된 자료에 쓸 수 없다"],
+  a:2, e:"항상 O(n log n)을 보장하는 대신, 합칠 때 임시 공간이 더 필요합니다."},
+ {q:"6. 부모 노드가 자식 노드보다 항상 큰 완전 이진 트리를 부르는 이름은?",
+  o:["최대 힙","최소 힙","편향 트리","신장 트리"],
+  a:0, e:"부모 ≥ 자식이면 최대 힙(루트가 최댓값), 부모 ≤ 자식이면 최소 힙입니다."},
+ {q:"7. 최선·평균·최악이 모두 O(n log n)인 정렬끼리 짝지은 것은?",
+  o:["버블, 선택","퀵, 버블","삽입, 퀵","합병, 힙"],
+  a:3, e:"합병과 힙은 어떤 데이터가 와도 O(n log n)을 보장합니다. 퀵은 최악 O(n²)!"},
+ {q:"8. 완전 이진 트리 구조를 이용하여 정렬하는 알고리즘은?",
+  o:["퀵 정렬","힙 정렬","합병 정렬","삽입 정렬"],
+  a:1, e:"힙 = 완전 이진 트리. 루트(우승자)를 하나씩 꺼내며 정렬합니다."},
+ {q:"9. (복습) 자료 8, 3, 4, 9, 7을 선택 정렬(오름차순)로 1회전 한 결과는?",
+  o:["3, 8, 4, 9, 7","3, 4, 8, 7, 9","8, 3, 4, 7, 9","3, 4, 7, 8, 9"],
+  a:0, e:"최솟값 3을 찾아 맨 앞의 8과 교환 → 3, 8, 4, 9, 7. 최솟값이 맨 앞에 확정!"},
+ {q:"10. (복습) 이미 거의 정렬된 자료에서 가장 효율적인 단순 정렬은?",
+  o:["버블 정렬","선택 정렬","삽입 정렬","힙 정렬"],
+  a:2, e:"삽입 정렬은 정렬된 자료에서 최선 O(n)으로 가장 유리합니다. 어제 배운 핵심이죠!"}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 40 · 정렬 알고리즘 ① — 버블·선택·삽입</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 40 · 2과목 소프트웨어 개발</span>
+    <h1>정렬 알고리즘 ① — 버블·선택·삽입</h1>
+    <p>2026-08-12 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 39)는 그래프를 배웠어요. 딱 하나만 다시: <b>DFS는 스택(한 길 끝까지), BFS는 큐(옆으로 넓게)</b>, 그리고 무방향 그래프 최대 간선 수는 n(n−1)/2였죠. 오늘부터 이틀간은 데이터를 순서대로 줄 세우는 <b>정렬</b>입니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 정렬(Sort)이란? — 줄 세우기</h2>
+    <p><b>정렬</b>은 뒤죽박죽인 데이터를 <b>작은 것부터(오름차순) 또는 큰 것부터(내림차순) 줄 세우는 것</b>이에요. 오늘 배우는 세 가지(버블·선택·삽입)는 단순하지만 느린 기본 정렬로, 평균 시간 복잡도가 모두 <b>O(n²)</b>입니다.</p>
+    <div class="easy"><b>비유</b> — 키 순서로 줄 세우기! 방법이 여러 가지죠. 옆 사람끼리 비교해 바꾸기(버블), 제일 작은 사람 찾아 앞으로 보내기(선택), 한 명씩 제자리에 끼워 넣기(삽입). 이름이 곧 방법이에요.</div>
+    <div class="point"><b>시험 포인트</b> — 시험 문제의 90%는 "OO 정렬로 1회전(pass) 후의 결과는?"입니다. 각 정렬의 1회전 규칙만 정확히 알면 다 풀려요.</div>
+  </section>
+
+  <section>
+    <h2>2. 버블 정렬 (Bubble Sort) — 옆 사람과 비교해 바꾸기</h2>
+    <p><b>버블 정렬</b>은 <b>이웃한 두 값을 비교해서 순서가 틀리면 자리를 바꾸는</b> 것을 반복해요. 1회전이 끝나면 <b>가장 큰 값이 거품처럼 맨 뒤로</b> 올라갑니다.</p>
+    <p>예: <b>9, 6, 7, 3, 5</b>를 오름차순 버블 정렬 — 1회전 과정:</p>
+    <table>
+      <tr><th>비교</th><th>결과</th></tr>
+      <tr><td>(9,6) 비교 → 교환</td><td>6, 9, 7, 3, 5</td></tr>
+      <tr><td>(9,7) 비교 → 교환</td><td>6, 7, 9, 3, 5</td></tr>
+      <tr><td>(9,3) 비교 → 교환</td><td>6, 7, 3, 9, 5</td></tr>
+      <tr><td>(9,5) 비교 → 교환</td><td><b>6, 7, 3, 5, 9</b> ← 1회전 완료</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 버블 1회전 후엔 <b>최댓값이 맨 끝에 확정</b>돼요. 위처럼 손으로 직접 따라가는 연습이 최고의 공부입니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 선택 정렬 (Selection Sort) — 최솟값 찾아 앞으로</h2>
+    <p><b>선택 정렬</b>은 전체에서 <b>가장 작은 값을 '선택'해 맨 앞자리와 교환</b>하고, 남은 것들 중 또 최솟값을 찾아 두 번째 자리와 교환... 을 반복해요.</p>
+    <p>예: <b>9, 6, 7, 3, 5</b> — 1회전: 최솟값 3을 찾아 맨 앞 9와 교환 → <b>3, 6, 7, 9, 5</b></p>
+    <div class="easy"><b>비유</b> — 반에서 제일 작은 학생을 찾아 1번 자리로, 남은 학생 중 제일 작은 학생을 2번 자리로... 앞에서부터 자리가 확정돼요. (버블은 뒤부터, 선택은 앞부터 확정!)</div>
+    <div class="point"><b>시험 포인트</b> — 선택 정렬 1회전 후엔 <b>최솟값이 맨 앞에 확정</b>. 버블(최댓값이 뒤로)과 반대 방향인 게 구분 포인트예요.</div>
+  </section>
+
+  <section>
+    <h2>4. 삽입 정렬 (Insertion Sort) — 카드 정리하듯 끼워 넣기</h2>
+    <p><b>삽입 정렬</b>은 두 번째 값부터 시작해서, 각 값을 <b>이미 정렬된 앞부분의 알맞은 위치에 끼워 넣는</b> 방식이에요.</p>
+    <p>예: <b>9, 6, 7, 3, 5</b> — 1회전: 두 번째 값 6을 앞부분(9)과 비교해 9 앞에 삽입 → <b>6, 9, 7, 3, 5</b></p>
+    <div class="easy"><b>비유</b> — 손에 든 카드 정리! 새 카드를 받을 때마다 이미 정리된 카드들 사이의 맞는 자리에 쏙 끼워 넣죠. 그래서 <b>거의 정렬된 데이터에서는 가장 빠른</b>(최선 O(n)) 정렬이에요.</div>
+    <div class="point"><b>시험 포인트</b> — "이미 순서화된 파일에서 가장 유리한 정렬은?" → <b>삽입 정렬</b>. 이 문제가 그대로 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 세 정렬 한눈에 비교</h2>
+    <table>
+      <tr><th>정렬</th><th>1회전 규칙</th><th>1회전 후 확정</th><th>시간 복잡도(평균)</th></tr>
+      <tr><td>버블</td><td>이웃끼리 비교·교환</td><td>최댓값이 맨 <b>뒤</b></td><td>O(n²)</td></tr>
+      <tr><td>선택</td><td>최솟값 찾아 앞과 교환</td><td>최솟값이 맨 <b>앞</b></td><td>O(n²)</td></tr>
+      <tr><td>삽입</td><td>앞의 정렬된 부분에 끼워 넣기</td><td>앞 2개가 정렬됨</td><td>O(n²) (최선 O(n))</td></tr>
+    </table>
+    <div class="easy"><b>내일 예고</b> — 내일은 더 빠른 O(n log n)급 정렬(퀵·합병·힙)을 배워요. 오늘 셋과 속도 비교가 시험 포인트가 됩니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 이웃한 두 값을 비교해 자리를 바꾸는 것을 반복하는 정렬은?",
+  o:["선택 정렬","삽입 정렬","버블 정렬","퀵 정렬"],
+  a:2, e:"거품(버블)이 위로 올라가듯 큰 값이 뒤로 이동 — 버블 정렬입니다."},
+ {q:"2. 버블 정렬(오름차순) 1회전이 끝난 후 확정되는 것은?",
+  o:["최댓값이 맨 뒤로 간다","최솟값이 맨 앞으로 온다","가운데 값이 정해진다","아무것도 확정되지 않는다"],
+  a:0, e:"1회전마다 가장 큰 값이 맨 뒤에 확정됩니다. 선택 정렬은 반대로 최솟값이 앞에 확정!"},
+ {q:"3. 자료 9, 6, 7, 3, 5를 버블 정렬(오름차순)로 1회전 한 결과는?",
+  o:["3, 6, 7, 9, 5","6, 7, 3, 5, 9","3, 5, 6, 7, 9","6, 9, 7, 3, 5"],
+  a:1, e:"(9,6)교환→(9,7)교환→(9,3)교환→(9,5)교환으로 9가 맨 뒤로: 6, 7, 3, 5, 9입니다."},
+ {q:"4. 전체에서 최솟값을 찾아 맨 앞과 교환하는 것을 반복하는 정렬은?",
+  o:["버블 정렬","합병 정렬","삽입 정렬","선택 정렬"],
+  a:3, e:"최솟값을 '선택'해서 앞으로 보내는 선택 정렬입니다."},
+ {q:"5. 자료 9, 6, 7, 3, 5를 선택 정렬(오름차순)로 1회전 한 결과는?",
+  o:["3, 6, 7, 9, 5","6, 7, 3, 5, 9","5, 6, 7, 3, 9","3, 5, 6, 7, 9"],
+  a:0, e:"최솟값 3과 맨 앞의 9를 교환 → 3, 6, 7, 9, 5. 최솟값이 맨 앞에 확정됩니다."},
+ {q:"6. 카드 정리하듯 각 값을 정렬된 앞부분의 알맞은 자리에 끼워 넣는 정렬은?",
+  o:["삽입 정렬","선택 정렬","버블 정렬","힙 정렬"],
+  a:0, e:"알맞은 위치에 '삽입'하는 삽입 정렬입니다."},
+ {q:"7. 이미 거의 정렬되어 있는 데이터에 가장 유리한 정렬은?",
+  o:["버블 정렬","삽입 정렬","선택 정렬","전부 동일하다"],
+  a:1, e:"삽입 정렬은 정렬된 데이터에서 비교만 하고 지나가므로 최선의 경우 O(n)으로 가장 빠릅니다."},
+ {q:"8. 버블·선택·삽입 정렬의 평균 시간 복잡도는?",
+  o:["O(1)","O(log n)","O(n log n)","O(n²)"],
+  a:3, e:"단순 정렬 3형제는 모두 평균 O(n²)입니다. 내일 배울 퀵·합병·힙은 O(n log n)!"},
+ {q:"9. (복습) 최소 신장 트리(MST)를 구하는 알고리즘은?",
+  o:["크루스칼과 프림","버블과 삽입","DFS와 BFS","푸시와 팝"],
+  a:0, e:"어제 배운 크루스칼(싼 간선부터)과 프림(정점에서 확장)입니다."},
+ {q:"10. (복습) 정점이 6개인 무방향 그래프의 최대 간선 수는?",
+  o:["12개","30개","15개","36개"],
+  a:2, e:"n(n−1)/2 = 6×5÷2 = 15개입니다. 공식 잊지 마세요!"}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>

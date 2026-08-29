@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 35 · 1과목 졸업 시험 — 주간 복습 + 종합 테스트 15문제</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 35 · 1과목 소프트웨어 설계</span>
+    <h1>1과목 졸업 시험 🎓 — 주간 복습 + 종합 테스트 15문제</h1>
+    <p>2026-08-07 · 5주차 복습 + 1과목 전체 종합 테스트 15문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 34)는 객체지향·디자인 패턴·인터페이스를 총복습했어요. 딱 하나만 다시: 미들웨어(두 시스템 사이의 중간 다리 소프트웨어) 중 <b>MOM은 메시지 기반 비동기 통신, TP-Monitor는 트랜잭션 처리·감시, WAS는 동적 웹 서비스 처리</b>였죠. 오늘은 드디어 1과목 마지막 날! 이번 주 내용을 정리하고 종합 테스트로 졸업합니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 이번 주(5주차) 핵심 요약 — 인터페이스와 미들웨어</h2>
+    <table>
+      <tr><th>주제</th><th>꼭 기억할 것</th></tr>
+      <tr><td>인터페이스 요구사항</td><td>기능적(무엇을 하는가) / 비기능적(성능·보안 등 품질)으로 구분, 검증 후 베이스라인(공식 기준선)으로 고정</td></tr>
+      <tr><td>인터페이스 시스템 구성</td><td>송신 시스템 · 수신 시스템 · 중계 서버 (편지: 보내는 사람·받는 사람·우체국)</td></tr>
+      <tr><td>연계 방식</td><td>직접 연계(빠름, 강한 결합) vs 간접 연계(EAI 등 솔루션 경유, 유연함, 이기종 연결에 유리)</td></tr>
+      <tr><td>EAI 구축 유형</td><td>Point-to-Point(1:1) / Hub &amp; Spoke(중앙 허브, 허브 고장 = 전체 마비) / Message Bus(공용 버스) / Hybrid(혼합)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>2. 1과목 전체 뼈대 한 장 정리</h2>
+    <p>1과목은 크게 <b>4개의 기둥</b>으로 이루어져 있어요. 시험 전에 이 지도를 떠올리면 어떤 문제든 "아, 그 동네 문제구나" 하고 자리를 잡을 수 있습니다.</p>
+    <table>
+      <tr><th>기둥</th><th>핵심 키워드</th></tr>
+      <tr><td>① 개발 방법론</td><td>생명주기(요설구테유), 폭포수(순차·되돌아가기 어려움), 프로토타입(시제품), 나선형(위험 분석), 애자일(스크럼·XP)</td></tr>
+      <tr><td>② 요구사항·UML</td><td>요구사항 개발 순서(도출→분석→명세→확인), 기능/비기능 구분, UML 다이어그램(구조/행위), 유스케이스·클래스·시퀀스</td></tr>
+      <tr><td>③ 설계·객체지향</td><td>모듈화, 결합도 낮게·응집도 높게, 객체지향 개념(캡슐화·상속·다형성 등), SOLID, 디자인 패턴(생성·구조·행위)</td></tr>
+      <tr><td>④ 인터페이스</td><td>송신·수신·중계, 직접/간접 연계, 미들웨어(RPC·MOM·TP-Monitor·ORB·WAS), EAI 4유형</td></tr>
+    </table>
+    <div class="easy"><b>공부 요령</b> — 필기시험은 과목당 20문제 중 8문제(40점)만 넘으면 과락을 면해요. 위 표의 굵은 키워드만 정확해도 절반 이상은 잡을 수 있습니다.</div>
+    <div class="point"><b>시험 포인트</b> — 1과목 최다 출제 3대장: ① 결합도·응집도 순서 ② 디자인 패턴 키워드 매칭 ③ 개발 방법론 특징 구분. 오늘 테스트에도 모두 나옵니다!</div>
+  </section>
+
+  <section>
+    <h2>3. 헷갈리기 쉬운 짝꿍 개념 최종 구분</h2>
+    <table>
+      <tr><th>짝꿍</th><th>구분법</th></tr>
+      <tr><td>오버로딩 vs 오버라이딩</td><td>로딩 = 같은 이름 여러 개 싣기(매개변수 다름) / 라이딩 = 부모 메서드 위에 올라타 재정의</td></tr>
+      <tr><td>프로토타입 모형 vs 프로토타입 패턴</td><td>모형 = 시제품 개발 방식 / 패턴 = 객체를 복제(clone)해 생성</td></tr>
+      <tr><td>어댑터 vs 퍼사드</td><td>어댑터 = 규격 변환기(호환) / 퍼사드 = 복잡한 내부를 하나의 창구로</td></tr>
+      <tr><td>기능적 vs 비기능적 요구사항</td><td>기능 = 시스템이 "무엇을" 하나 / 비기능 = 성능·보안·품질 같은 "얼마나 잘"</td></tr>
+    </table>
+  </section>
+
+  <section class="quiz">
+    <h2>1과목 종합 테스트 (15문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점돼요. 12개 이상 맞히면 1과목 졸업 합격입니다!</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어 생명주기 단계의 올바른 순서는?",
+  o:["설계 → 요구사항 분석 → 구현 → 테스트 → 유지보수","요구사항 분석 → 설계 → 구현 → 테스트 → 유지보수","요구사항 분석 → 구현 → 설계 → 테스트 → 유지보수","설계 → 구현 → 요구사항 분석 → 유지보수 → 테스트"],
+  a:1, e:"'요설구테유'! 요구사항 분석이 항상 처음, 유지보수가 마지막입니다."},
+ {q:"2. 매 반복마다 '위험 분석' 단계를 수행하는 개발 모형은?",
+  o:["폭포수 모형","프로토타입 모형","나선형 모형","V 모형"],
+  a:2, e:"'위험 분석'이 보이면 무조건 나선형(Spiral)입니다. 계획→위험 분석→개발→고객 평가 반복."},
+ {q:"3. 애자일 선언문에서 더 높은 가치를 두는 것은?",
+  o:["방대한 문서","계획을 그대로 따르기","공정과 도구","고객과의 협력"],
+  a:3, e:"애자일은 문서·계획·도구보다 소통, 작동하는 소프트웨어, 고객과의 협력, 변화 대응을 중시합니다."},
+ {q:"4. 요구사항 개발(CMM 기준) 과정의 올바른 순서는?",
+  o:["도출 → 분석 → 명세 → 확인","분석 → 도출 → 확인 → 명세","명세 → 도출 → 분석 → 확인","도출 → 명세 → 분석 → 확인"],
+  a:0, e:"도출(끌어내기)→분석(다듬기)→명세(문서화)→확인(검증). '도분명확'으로 외우세요."},
+ {q:"5. '시스템 응답 시간은 3초 이내여야 한다'는 어떤 요구사항인가?",
+  o:["기능적 요구사항","비기능적 요구사항","인터페이스 요구사항","사용자 요구사항"],
+  a:1, e:"성능·보안·품질처럼 '얼마나 잘'에 대한 것은 비기능적 요구사항입니다."},
+ {q:"6. UML 다이어그램 중 시간의 흐름에 따라 객체 간 주고받는 메시지를 표현하는 것은?",
+  o:["클래스 다이어그램","유스케이스 다이어그램","시퀀스 다이어그램","배치 다이어그램"],
+  a:2, e:"시퀀스(sequence, 순서) = 시간 순서대로 메시지 흐름을 그리는 행위 다이어그램입니다."},
+ {q:"7. 결합도를 낮은 것(좋음)부터 높은 것(나쁨) 순서로 나열할 때 가장 낮은 것은?",
+  o:["내용 결합도","공통 결합도","제어 결합도","자료 결합도"],
+  a:3, e:"'자스제외공내' — 자료 결합도가 가장 낮아 제일 좋고, 내용 결합도가 최악입니다."},
+ {q:"8. 응집도가 가장 높아 이상적인 모듈 형태는?",
+  o:["기능적 응집도","우연적 응집도","논리적 응집도","시간적 응집도"],
+  a:0, e:"하나의 기능만 수행하는 기능적 응집도가 최고, 우연적 응집도가 최악입니다."},
+ {q:"9. 객체지향에서 같은 메시지에 대해 객체마다 다르게 동작하는 성질은?",
+  o:["캡슐화","다형성","정보은닉","추상화"],
+  a:1, e:"'울어봐' 하면 개는 멍멍, 고양이는 야옹 — 다형성(polymorphism)입니다."},
+ {q:"10. 인스턴스(객체)를 오직 1개만 만들도록 보장하는 디자인 패턴은?",
+  o:["빌더 패턴","팩토리 메서드 패턴","싱글톤 패턴","옵저버 패턴"],
+  a:2, e:"싱글(single, 하나) + 톤 = 단 하나의 객체만 존재하게 하는 생성 패턴입니다."},
+ {q:"11. 서로 호환되지 않는 인터페이스를 변환기처럼 연결해 주는 구조 패턴은?",
+  o:["어댑터 패턴","퍼사드 패턴","전략 패턴","컴포지트 패턴"],
+  a:0, e:"해외여행용 돼지코 어댑터처럼 규격을 맞춰 주는 어댑터 패턴입니다. 퍼사드는 '단일 창구'!"},
+ {q:"12. 한 객체의 상태 변화를 구독 중인 여러 객체에 자동으로 알려 주는 행위 패턴은?",
+  o:["커맨드 패턴","템플릿 메서드 패턴","상태 패턴","옵저버 패턴"],
+  a:3, e:"유튜브 구독 알림처럼 자동 통지 = 옵저버(관찰자) 패턴입니다."},
+ {q:"13. 메시지 기반의 비동기(서로 기다리지 않는) 통신을 지원하는 미들웨어는?",
+  o:["WAS","MOM","RPC","TP-Monitor"],
+  a:1, e:"MOM(Message Oriented Middleware) = 메시지 지향 미들웨어, 키워드는 '비동기'입니다."},
+ {q:"14. EAI 구축 유형 중 중앙 허브에 장애가 나면 전체 연계가 마비되는 방식은?",
+  o:["Point-to-Point","Message Bus","Hub & Spoke","Hybrid"],
+  a:2, e:"모든 시스템이 중앙 허브 하나에 연결된 Hub & Spoke의 약점입니다."},
+ {q:"15. (복습) XP(익스트림 프로그래밍)의 5가지 가치에 속하지 않는 것은?",
+  o:["용기","의사소통","피드백","경쟁"],
+  a:3, e:"XP 5가치: 용기·단순성·의사소통·피드백·존중. 경쟁은 없습니다. 1과목 졸업 축하해요! 내일부터 2과목 시작 💪"}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=12?'1과목 졸업 합격! 내일부터 2과목 소프트웨어 개발로 넘어갑니다 🎓':correct>=9?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 요약표를 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+</script>
+</body>
+</html>
