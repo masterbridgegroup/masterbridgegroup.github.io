@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 48 · 통합 구현과 단위 모듈 — 조각을 하나로 합치기</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 48 · 2과목 소프트웨어 개발</span>
+    <h1>통합 구현과 단위 모듈 — 조각을 하나로 합치기</h1>
+    <p>2026-08-20 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 47)는 데이터베이스와 DBMS를 배웠어요. 딱 하나만 다시: <b>DBMS의 3대 기능은 정의·조작·제어</b>이고, 스키마 중 <b>개념 스키마는 조직에 딱 하나</b>, <b>외부 스키마는 사용자마다 여러 개</b>였죠. 오늘은 만들어 놓은 프로그램 조각들을 <b>하나의 시스템으로 합치는 과정</b>을 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 단위 모듈이란? — 프로그램의 부품 하나</h2>
+    <p><b>단위 모듈</b>(Unit Module)은 소프트웨어를 이루는 <b>기능 단위의 최소 부품</b>이에요. 하나의 모듈은 보통 <b>한 가지 일만</b> 합니다.</p>
+    <div class="easy"><b>비유</b> — 자동차를 만들 때 엔진, 바퀴, 핸들을 각각 따로 만들죠. 이 부품 하나하나가 <b>단위 모듈</b>이고, 부품을 조립해 자동차를 완성하는 일이 <b>통합 구현</b>이에요. "화면에 로그인 창 띄우기", "비밀번호 맞는지 확인하기" 같은 게 각각 하나의 모듈이 됩니다.</div>
+    <p>모듈은 두 가지로 이루어져 있어요.</p>
+    <table>
+      <tr><th>구성</th><th>내용</th></tr>
+      <tr><td>단위 기능 <b>명세서</b></td><td>이 모듈이 <b>무엇을 하는지</b> 적은 설명서 (입력·출력·처리 내용)</td></tr>
+      <tr><td>입·출력 <b>기능 구현</b></td><td>실제로 값을 받아 처리하고 결과를 내보내는 <b>코드</b></td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 좋은 모듈의 조건은 <b>1과목에서 배운 그것</b>입니다. <b>결합도는 낮게(약하게), 응집도는 높게(강하게)</b>! 모듈끼리 덜 엉키고, 모듈 하나는 한 가지 일에 집중해야 한다는 뜻이에요. 이 문장은 전 과목에서 반복 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 통합 구현 — 조각을 이어 붙이는 과정</h2>
+    <p><b>통합 구현</b>은 단위 모듈들과 외부 시스템을 <b>연결해 하나의 완성된 시스템으로 만드는 과정</b>이에요. 구성 요소는 다음과 같습니다.</p>
+    <table>
+      <tr><th>구성 요소</th><th>역할</th></tr>
+      <tr><td>송신 시스템·모듈</td><td>데이터를 <b>보내는</b> 쪽. 필요한 데이터를 만들어 전송</td></tr>
+      <tr><td>수신 시스템·모듈</td><td>데이터를 <b>받는</b> 쪽. 받아서 자기 형식으로 변환·저장</td></tr>
+      <tr><td>중계 서버</td><td>둘 사이에서 <b>데이터를 전달·변환</b>해 주는 중간 서버 (필수는 아님)</td></tr>
+      <tr><td>연계 데이터</td><td>실제로 주고받는 데이터 (형식·항목을 미리 정의해 둠)</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 쇼핑몰에서 주문을 하면, 쇼핑몰(송신)이 택배사 시스템(수신)에 배송 정보를 넘기죠. 이때 중간에서 형식을 맞춰 주는 서버가 <b>중계 서버</b>이고, 넘기는 주문번호·주소 묶음이 <b>연계 데이터</b>예요.</div>
+    <div class="point"><b>시험 포인트</b> — 통합 구현은 <b>송신 → (중계) → 수신</b>의 흐름으로 기억하세요. 중계 서버는 <b>선택 사항</b>이라는 점이 함정으로 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>3. IPC — 프로그램끼리 대화하는 방법</h2>
+    <p><b>IPC</b>(Inter-Process Communication, 프로세스 간 통신)는 <b>따로 돌아가는 프로그램들이 데이터를 주고받는 방법</b>을 모아 부르는 말이에요. 모듈을 합치려면 서로 말을 걸 수 있어야 하니까요.</p>
+    <table>
+      <tr><th>방식</th><th>쉬운 설명</th></tr>
+      <tr><td><b>공유 메모리</b><br>(Shared Memory)</td><td>메모리 한 구역을 <b>공동 칠판</b>처럼 함께 쓰며 읽고 씀. 가장 빠름</td></tr>
+      <tr><td><b>소켓</b><br>(Socket)</td><td><b>네트워크로 연결</b>해 데이터를 주고받음. 다른 컴퓨터와도 통신 가능</td></tr>
+      <tr><td><b>메시지 큐</b><br>(Message Queue)</td><td>메시지를 <b>줄 세워 두고</b> 상대가 꺼내 감. 서로 기다리지 않아도 됨(비동기)</td></tr>
+      <tr><td><b>파이프</b><br>(Pipe / Named Pipe)</td><td><b>관</b>을 하나 놓고 한쪽에서 넣으면 다른 쪽으로 흘러나옴</td></tr>
+      <tr><td><b>원격 프로시저 호출</b><br>(RPC)</td><td>다른 컴퓨터의 함수를 <b>내 함수처럼 불러서</b> 실행</td></tr>
+    </table>
+    <div class="easy"><b>한 줄로 구분</b> — 공유 메모리는 <b>공동 칠판</b>, 소켓은 <b>전화선</b>, 메시지 큐는 <b>사서함</b>, 파이프는 <b>수도관</b>, RPC는 <b>남의 집 리모컨 누르기</b>.</div>
+    <div class="point"><b>시험 포인트</b> — "메시지가 큐에 저장되어 비동기로 처리되는 IPC 방식은?" → <b>메시지 큐</b>. "두 프로세스가 같은 메모리 영역을 공유하는 방식은?" → <b>공유 메모리</b>. 용어와 설명 짝짓기로 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 개발 지원 도구 — 혼자 다 하지 않는다</h2>
+    <p>개발을 도와주는 도구들의 이름과 역할을 정리해 둡시다. 용어만 묻는 문제로 자주 나와요.</p>
+    <table>
+      <tr><th>도구</th><th>역할</th><th>예시</th></tr>
+      <tr><td><b>IDE</b><br>(통합 개발 환경)</td><td>코드 작성·컴파일·디버깅을 <b>한 화면에서</b> 다 할 수 있게 묶은 도구</td><td>이클립스, 비주얼 스튜디오, IntelliJ</td></tr>
+      <tr><td><b>빌드 도구</b></td><td>소스 코드를 <b>실행 가능한 형태로 자동 변환</b>하고 필요한 부품(라이브러리)을 챙겨 옴</td><td>Ant, Maven, Gradle</td></tr>
+      <tr><td><b>협업 도구</b></td><td>여러 사람이 <b>일정·문서·이슈를 공유</b></td><td>Jira, Confluence, Slack</td></tr>
+      <tr><td><b>형상 관리 도구</b></td><td>소스 코드의 <b>변경 이력을 관리</b></td><td>Git, SVN, CVS</td></tr>
+      <tr><td><b>테스트 도구</b></td><td>코드가 제대로 동작하는지 <b>자동으로 검사</b></td><td>JUnit, Selenium</td></tr>
+    </table>
+    <div class="easy"><b>IDE의 5가지 기능</b> — 개발(Coding) · 컴파일(Compile) · 디버깅(Debugging) · 배포(Deployment) · 형상 관리 연동. "코·컴·디·배"로 묶어 두세요.</div>
+    <div class="point"><b>시험 포인트</b> — <b>빌드 자동화 도구 3형제(Ant · Maven · Gradle)</b>는 다음 주(형상 관리·빌드 자동화)에 다시 나오는 핵심입니다. 이름만이라도 미리 눈에 익혀 두세요.</div>
+  </section>
+
+  <section>
+    <h2>5. 이번 주 마무리 — 배운 것 한 줄씩</h2>
+    <p>Day 43~48, 이번 주에 배운 내용을 한 줄로 압축했습니다. 내일(Day 49)은 이 내용으로 주간 복습 + 종합 테스트 15문제를 봅니다.</p>
+    <table>
+      <tr><th>Day</th><th>주제</th><th>꼭 기억할 한 줄</th></tr>
+      <tr><td>43</td><td>순차·이진 탐색</td><td>순차 O(n)·평균 (n+1)/2회 / 이진 O(log₂n)·<b>정렬 필수</b></td></tr>
+      <tr><td>44</td><td>이진 탐색 트리</td><td>왼쪽 &lt; 루트 &lt; 오른쪽, 중위 순회하면 <b>오름차순</b>, 편향되면 O(n)</td></tr>
+      <tr><td>45</td><td>해싱 기본</td><td>주소를 계산해 <b>O(1)</b>, 제산법(소수로 나눈 나머지)이 대표</td></tr>
+      <tr><td>46</td><td>충돌 해결·파일 구조</td><td>개방 주소법 vs 체이닝 / <b>색인 순차 파일은 순차+직접 접근 모두 가능</b></td></tr>
+      <tr><td>47</td><td>DB 개요</td><td>DBMS 3기능 <b>정의·조작·제어</b>, <b>개념 스키마는 하나</b></td></tr>
+      <tr><td>48</td><td>통합 구현</td><td>결합도 <b>낮게</b>·응집도 <b>높게</b>, IPC 5종(공유 메모리·소켓·메시지 큐·파이프·RPC)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 이번 주에서 출제 빈도가 가장 높은 세 가지만 고르면 ① <b>이진 탐색은 정렬된 자료에만, O(log₂n)</b> ② <b>해싱은 O(1), 충돌·오버플로 용어 구분</b> ③ <b>DBMS 3대 기능과 스키마 3단계</b>입니다. 오늘 자기 전에 이 세 줄만 다시 읽어 보세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어를 이루는 기능 단위의 최소 부품을 무엇이라 하는가?",
+  o:["단위 모듈", "통합 구현", "중계 서버", "연계 데이터"],
+  a:0, e:"단위 모듈은 한 가지 기능만 담당하는 최소 구성 부품입니다."},
+ {q:"2. 단위 모듈의 구성 요소로 올바른 것은?",
+  o:["단위 기능 명세서와 입·출력 기능 구현", "송신 모듈과 수신 모듈", "공유 메모리와 소켓", "IDE와 빌드 도구"],
+  a:0, e:"무엇을 하는지 적은 명세서와, 실제 동작하는 입·출력 코드로 구성됩니다."},
+ {q:"3. 바람직한 모듈 설계의 기준으로 올바른 것은?",
+  o:["결합도를 높이고 응집도를 낮춘다", "결합도를 낮추고 응집도를 높인다", "결합도와 응집도를 모두 높인다", "결합도와 응집도를 모두 낮춘다"],
+  a:1, e:"모듈끼리는 덜 엉키게(결합도 낮게), 모듈 하나는 한 가지 일에 집중하게(응집도 높게) 만듭니다."},
+ {q:"4. 통합 구현의 구성 요소가 아닌 것은?",
+  o:["송신 시스템", "수신 시스템", "중계 서버", "정규화"],
+  a:3, e:"정규화는 데이터베이스 설계 기법으로 3과목에서 배웁니다."},
+ {q:"5. 프로세스 간 통신(IPC) 방식 중 메모리 영역을 함께 사용하여 데이터를 주고받는 것은?",
+  o:["소켓", "공유 메모리", "메시지 큐", "파이프"],
+  a:1, e:"공유 메모리(Shared Memory)는 공동 칠판처럼 같은 메모리를 함께 씁니다. 가장 빠른 방식입니다."},
+ {q:"6. 메시지를 큐에 저장해 두고 상대가 꺼내 가도록 하여 비동기 통신이 가능한 IPC 방식은?",
+  o:["공유 메모리", "메시지 큐", "RPC", "IDE"],
+  a:1, e:"메시지 큐는 사서함처럼 동작해 서로 기다릴 필요가 없습니다."},
+ {q:"7. 네트워크를 통해 다른 컴퓨터의 함수를 자신의 함수처럼 호출하는 IPC 방식은?",
+  o:["파이프", "소켓", "원격 프로시저 호출(RPC)", "공유 메모리"],
+  a:2, e:"RPC(Remote Procedure Call)입니다."},
+ {q:"8. 코드 작성, 컴파일, 디버깅, 배포를 한 환경에서 수행할 수 있도록 묶은 도구는?",
+  o:["IDE(통합 개발 환경)", "형상 관리 도구", "테스트 도구", "협업 도구"],
+  a:0, e:"이클립스, 비주얼 스튜디오, IntelliJ 등이 IDE입니다."},
+ {q:"9. 다음 중 빌드 자동화 도구에 해당하는 것은?",
+  o:["Git", "Maven", "JUnit", "Jira"],
+  a:1, e:"빌드 도구는 Ant·Maven·Gradle입니다. Git은 형상 관리, JUnit은 테스트, Jira는 협업 도구입니다."},
+ {q:"10. (복습) DBMS의 필수 기능 중 데이터의 정확성과 보안을 유지하는 기능은?",
+  o:["정의 기능", "조작 기능", "제어 기능", "저장 기능"],
+  a:2, e:"제어(Control) 기능이며 DCL(GRANT·REVOKE 등)과 연결됩니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

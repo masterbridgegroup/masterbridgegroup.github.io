@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 45 · 해싱 ① — 계산해서 바로 찾아가는 마법</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 45 · 2과목 소프트웨어 개발</span>
+    <h1>해싱 ① — 계산해서 바로 찾아가는 마법</h1>
+    <p>2026-08-17 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 44)는 이진 탐색 트리를 배웠어요. 딱 하나만 다시: <b>BST는 왼쪽 &lt; 루트 &lt; 오른쪽 규칙을 지키는 트리</b>이고, <b>중위 순회하면 오름차순</b>으로 나왔죠. 하지만 BST도 결국 <b>여러 번 비교</b>를 해야 합니다. 오늘은 <b>비교를 아예 하지 않고 단 한 번에 찾아가는</b> 방법을 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 해싱(Hashing)이란? — 주소를 계산해 버린다</h2>
+    <p>지금까지 배운 탐색은 모두 "비교"를 했어요. 순차 탐색은 n번, 이진 탐색은 log n번 비교했죠. <b>해싱</b>은 완전히 다른 발상입니다. <b>찾는 값 자체를 계산해서 저장 위치(주소)를 바로 알아내는</b> 방법이에요.</p>
+    <div class="easy"><b>쉽게 말하면</b> — 아파트 우편함을 떠올려 보세요. '502호 우편물'을 찾을 때 1호부터 다 열어 보지 않죠. <b>호수 = 우편함 번호</b>라는 규칙이 있으니 곧장 502번 함으로 갑니다. 해싱은 이 '규칙으로 주소 계산하기'를 데이터에 적용한 거예요.</div>
+    <p>용어를 정리하면 이렇습니다.</p>
+    <table>
+      <tr><th>용어</th><th>쉬운 뜻</th></tr>
+      <tr><td>키(Key)</td><td>찾을 때 기준이 되는 값 (예: 학번, 주민번호, 상품코드)</td></tr>
+      <tr><td>해시 함수(Hash Function)</td><td>키를 넣으면 저장 위치를 계산해 주는 <b>계산 규칙</b></td></tr>
+      <tr><td>해시값 / 해시 주소</td><td>해시 함수가 뱉어낸 결과 = 저장할 <b>위치 번호</b></td></tr>
+      <tr><td>해시 테이블(Hash Table)</td><td>데이터가 실제로 담기는 <b>표(저장 공간)</b></td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 해싱의 평균 시간 복잡도는 <b>O(1)</b>입니다. 자료가 100만 개여도 계산 한 번으로 찾으니까요. "탐색 시간이 자료의 개수와 무관한 방법은?" → 해싱.</div>
+  </section>
+
+  <section>
+    <h2>2. 버킷과 슬롯 — 해시 테이블의 구조</h2>
+    <p>해시 테이블은 <b>버킷</b>과 <b>슬롯</b>이라는 2단 구조로 되어 있어요.</p>
+    <div class="easy"><b>비유</b> — 아파트 <b>우편함 한 칸</b>이 <b>버킷</b>(Bucket)이고, 그 칸 안에 편지를 <b>여러 통 꽂을 수 있는 자리</b>가 <b>슬롯</b>(Slot)이에요. 버킷 하나에 슬롯이 3개면, 같은 주소가 나온 데이터 3개까지는 사이좋게 들어갈 수 있죠.</div>
+    <p>여기서 해싱의 유일한 골칫거리가 등장합니다.</p>
+    <table>
+      <tr><th>용어</th><th>무슨 일이 벌어진 것인가</th></tr>
+      <tr><td><b>충돌</b>(Collision)</td><td>서로 <b>다른 키</b>인데 해시 함수가 <b>같은 주소</b>를 내놓은 상황</td></tr>
+      <tr><td><b>동거자</b>(Synonym)</td><td>충돌이 일어나 같은 주소를 배정받은 <b>키들</b>을 부르는 말</td></tr>
+      <tr><td><b>오버플로</b>(Overflow)</td><td>충돌이 계속 일어나 그 버킷의 <b>슬롯이 다 차서 더 넣을 수 없는</b> 상황</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — <b>충돌 ≠ 오버플로</b>를 구분하는 문제가 자주 나옵니다. 주소가 겹친 것이 <b>충돌</b>, 겹친 데다 자리까지 없어진 것이 <b>오버플로</b>. 슬롯이 여러 개면 충돌이 나도 오버플로는 아닐 수 있어요.</div>
+  </section>
+
+  <section>
+    <h2>3. 해시 함수 ① — 제산법과 중간 제곱법</h2>
+    <p>좋은 해시 함수는 <b>주소를 골고루 흩뿌려 충돌을 줄이는</b> 함수예요. 시험에 나오는 방법을 하나씩 봅시다.</p>
+    <p><b>제산법(Division Method)</b> — 가장 많이 쓰이고 가장 많이 출제되는 방법입니다. 키를 <b>어떤 수로 나눈 나머지</b>를 주소로 씁니다.</p>
+    <div class="easy"><b>계산해 보기</b> — 버킷이 11개(0~10번)이고 키가 125라면, 125 ÷ 11 = 11 … 나머지 <b>4</b>. 따라서 4번 버킷에 저장! 나머지는 절대 0~10을 벗어나지 않으니 언제나 테이블 안쪽 주소가 나와요.</div>
+    <p>나누는 수는 보통 <b>소수</b>(1과 자기 자신만으로 나누어지는 수: 11, 13, 17…)를 씁니다. 소수로 나누면 나머지가 더 고르게 퍼져 충돌이 줄어들기 때문이에요.</p>
+    <p><b>중간 제곱법(Mid-square)</b> — 키를 <b>제곱한 뒤 가운데 몇 자리</b>를 주소로 씁니다.</p>
+    <div class="easy"><b>계산해 보기</b> — 키가 123이면 123² = 15129. 가운데 두 자리 <b>51</b>을 주소로 사용! 제곱을 하면 모든 자릿수가 서로 영향을 주므로, 앞자리만 비슷한 키들도 잘 흩어져요.</div>
+    <div class="point"><b>시험 포인트</b> — "키를 소수로 나눈 나머지를 주소로 사용" = <b>제산법(나눗셈법)</b>. 이 한 문장이 가장 많이 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 해시 함수 ② — 폴딩·기수 변환·숫자 분석</h2>
+    <table>
+      <tr><th>방법</th><th>계산 방식</th><th>예시</th></tr>
+      <tr><td><b>폴딩법</b><br>(중첩법, Folding)</td><td>키를 <b>같은 길이로 잘라 접어서 더함</b></td><td>키 123456 → 12+34+56 = 102 → 주소 02</td></tr>
+      <tr><td><b>기수 변환법</b><br>(Radix)</td><td>키의 <b>진법을 바꾼 뒤</b> 필요한 자릿수만 사용</td><td>10진수 키를 11진수로 바꿔 씀</td></tr>
+      <tr><td><b>숫자 분석법</b><br>(계수 분석법)</td><td>키들의 각 자릿수를 조사해, <b>값이 고르게 분포한 자리</b>만 골라 씀</td><td>학번 앞 두 자리는 입학연도로 모두 같으니 버리고 뒷자리만 사용</td></tr>
+      <tr><td><b>무작위법</b><br>(Random)</td><td>난수(무작위 수)를 발생시켜 주소로 사용</td><td>-</td></tr>
+    </table>
+    <div class="easy"><b>이름으로 외우기</b> — <b>폴딩</b>은 fold(접다) → 잘라서 더하기. <b>기수</b>는 진법 → 진법 바꾸기. <b>숫자 분석</b>은 자릿수를 분석해서 좋은 자리만 뽑기. 이름과 뜻이 그대로 연결돼요.</div>
+    <div class="point"><b>시험 포인트</b> — "키를 여러 부분으로 나누어 더하거나 XOR한 값을 주소로 사용" = <b>폴딩법(중첩법)</b>. "각 자릿수의 분포를 분석해 고른 자리를 선택" = <b>숫자 분석법</b>.</div>
+  </section>
+
+  <section>
+    <h2>5. 해싱은 언제 쓰고, 무엇을 포기하는가</h2>
+    <p>해싱의 장단점을 정리하면 이렇습니다.</p>
+    <table>
+      <tr><th>장점</th><th>단점</th></tr>
+      <tr><td>탐색이 <b>O(1)</b> — 자료가 많아도 속도가 거의 일정</td><td><b>충돌·오버플로</b> 처리가 반드시 필요</td></tr>
+      <tr><td>정렬이 필요 없음</td><td>저장 순서가 없어 <b>순서대로 출력·범위 검색이 어려움</b></td></tr>
+      <tr><td>삽입·삭제도 빠름</td><td>테이블 공간을 넉넉히 잡아야 해 <b>메모리 낭비</b> 가능</td></tr>
+    </table>
+    <div class="easy"><b>언제 무엇을 쓸까</b> — "이 학번의 학생 정보 하나만 딱 찾고 싶다" → <b>해싱</b>. "성적 상위 10명, 또는 80점~90점 구간 학생" 같은 <b>순서·범위</b>가 필요하면 → <b>정렬·트리(BST·B-트리)</b>. 그래서 데이터베이스 인덱스는 해시가 아니라 B-트리를 주로 씁니다.</div>
+    <div class="point"><b>시험 포인트</b> — 탐색 방법별 시간 복잡도를 한 줄로 묶어 두세요. 순차 탐색 <b>O(n)</b> / 이진 탐색·BST <b>O(log₂n)</b> / 해싱 <b>O(1)</b>. 표로 묻는 문제가 나옵니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 키 값을 계산해 저장 위치(주소)를 직접 구하는 탐색 방법은?",
+  o:["순차 탐색", "이진 탐색", "해싱", "보간 탐색"],
+  a:2, e:"해싱은 비교 없이 해시 함수로 주소를 계산해 바로 접근합니다."},
+ {q:"2. 해싱의 평균 시간 복잡도는?",
+  o:["O(1)", "O(log n)", "O(n)", "O(n²)"],
+  a:0, e:"계산 한 번으로 주소를 알아내므로 자료 개수와 무관한 O(1)입니다."},
+ {q:"3. 서로 다른 키가 해시 함수를 통해 같은 주소를 갖게 되는 현상은?",
+  o:["오버플로", "충돌(Collision)", "오버헤드", "인덱싱"],
+  a:1, e:"주소가 겹치는 것이 충돌이고, 그 키들을 동거자(Synonym)라고 합니다."},
+ {q:"4. 충돌이 계속 일어나 해당 버킷의 슬롯이 모두 채워져 더 저장할 수 없는 상태는?",
+  o:["충돌", "동거자", "오버플로", "해시값"],
+  a:2, e:"자리까지 없어진 상태가 오버플로입니다. 충돌과 구분해야 합니다."},
+ {q:"5. 해시 테이블에서 하나의 주소에 해당하는 저장 공간의 단위를 무엇이라 하는가?",
+  o:["버킷(Bucket)", "키(Key)", "레코드", "인덱스"],
+  a:0, e:"버킷은 우편함 한 칸, 그 안의 개별 자리는 슬롯(Slot)입니다."},
+ {q:"6. 키를 소수로 나눈 나머지를 해시 주소로 사용하는 방법은?",
+  o:["폴딩법", "제산법", "중간 제곱법", "숫자 분석법"],
+  a:1, e:"제산법(나눗셈법)입니다. 나머지는 항상 테이블 범위 안에 들어옵니다."},
+ {q:"7. 버킷이 11개(0~10)인 해시 테이블에서 제산법을 사용할 때 키 125가 저장되는 주소는?",
+  o:["1번", "4번", "5번", "11번"],
+  a:1, e:"125 ÷ 11 = 11 나머지 4. 따라서 4번 버킷입니다."},
+ {q:"8. 키를 제곱한 후 그 결과의 중간 부분 자릿수를 주소로 사용하는 방법은?",
+  o:["제산법", "중간 제곱법", "기수 변환법", "무작위법"],
+  a:1, e:"중간 제곱법(Mid-square)입니다. 123² = 15129 → 가운데 51을 사용."},
+ {q:"9. 키를 여러 부분으로 나누어 더한 값을 해시 주소로 사용하는 방법은?",
+  o:["폴딩법(중첩법)", "숫자 분석법", "제산법", "기수 변환법"],
+  a:0, e:"종이를 접듯 잘라 더하는 방식이라 폴딩법(Folding)이라 합니다."},
+ {q:"10. (복습) 이진 탐색 트리를 중위 순회한 결과는 어떻게 나오는가?",
+  o:["오름차순 정렬", "내림차순 정렬", "삽입 순서 그대로", "무작위"],
+  a:0, e:"왼쪽 → 루트 → 오른쪽 순서이므로 항상 오름차순입니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

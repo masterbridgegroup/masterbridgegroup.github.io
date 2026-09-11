@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 44 · 탐색 알고리즘 ② — 이진 탐색 트리와 균형 트리</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 44 · 2과목 소프트웨어 개발</span>
+    <h1>탐색 알고리즘 ② — 이진 탐색 트리와 균형 트리</h1>
+    <p>2026-08-16 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 43)는 순차 탐색과 이진 탐색을 배웠어요. 딱 하나만 다시: <b>이진 탐색은 정렬된 자료에서만 쓸 수 있고, 한 번 비교할 때마다 범위가 절반으로 줄어 O(log₂n)</b>이었죠. 그런데 이진 탐색의 약점은 <b>자료를 새로 넣거나 뺄 때마다 정렬을 다시 유지해야 한다</b>는 것이었어요. 오늘은 그 약점을 해결한 자료구조를 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 이진 탐색 트리(BST)란? — 규칙 있는 나무</h2>
+    <p><b>이진 탐색 트리</b>(Binary Search Tree)는 이름 그대로 <b>이진 트리</b>(자식이 최대 2명)에 <b>탐색을 위한 규칙</b>을 하나 얹은 자료구조예요. 규칙은 단 하나입니다.</p>
+    <div class="easy"><b>BST의 단 하나의 규칙</b> — 어떤 노드를 기준으로, <b>왼쪽 자손은 모두 나보다 작고, 오른쪽 자손은 모두 나보다 크다</b>. 이 규칙이 모든 노드에서 지켜져야 해요.</div>
+    <p>예를 들어 50이 뿌리(루트)라면, 왼쪽 가지에는 30·20·40처럼 50보다 작은 값만, 오른쪽 가지에는 70·60·80처럼 50보다 큰 값만 들어갑니다.</p>
+    <p>왜 이렇게 만들까요? 값 하나를 찾을 때 <b>뿌리에서 시작해 크다/작다만 판단하면 한쪽 가지를 통째로 버릴 수 있어서</b>예요. 어제 배운 이진 탐색과 완전히 같은 원리인데, 이번엔 배열이 아니라 <b>트리</b>로 구현한 거죠.</p>
+    <div class="point"><b>시험 포인트</b> — "왼쪽 서브트리의 모든 값 &lt; 루트 &lt; 오른쪽 서브트리의 모든 값"이라는 문장이 BST의 정의입니다. 보기에서 이 문장을 골라내는 문제가 나와요.</div>
+  </section>
+
+  <section>
+    <h2>2. BST에 값을 넣어 보기 (삽입)</h2>
+    <p>빈 트리에 <b>50, 30, 70, 20, 40, 60</b>을 순서대로 넣어 봅시다. 넣는 방법은 "뿌리부터 크다/작다를 따라 내려가서, 빈 자리에 매달기"입니다.</p>
+    <table>
+      <tr><th>넣는 값</th><th>내려가는 길</th><th>결과</th></tr>
+      <tr><td>50</td><td>트리가 비어 있음</td><td>루트가 됨</td></tr>
+      <tr><td>30</td><td>50보다 작다 → 왼쪽</td><td>50의 왼쪽 자식</td></tr>
+      <tr><td>70</td><td>50보다 크다 → 오른쪽</td><td>50의 오른쪽 자식</td></tr>
+      <tr><td>20</td><td>50보다 작다 → 왼쪽(30), 30보다 작다 → 왼쪽</td><td>30의 왼쪽 자식</td></tr>
+      <tr><td>40</td><td>50보다 작다 → 왼쪽(30), 30보다 크다 → 오른쪽</td><td>30의 오른쪽 자식</td></tr>
+      <tr><td>60</td><td>50보다 크다 → 오른쪽(70), 70보다 작다 → 왼쪽</td><td>70의 왼쪽 자식</td></tr>
+    </table>
+    <div class="easy"><b>여기서 중요한 성질!</b> — 이렇게 만든 BST를 <b>중위 순회</b>(왼쪽 → 루트 → 오른쪽)하면 <b>20, 30, 40, 50, 60, 70</b> — 값이 <b>작은 것부터 순서대로</b> 나옵니다. 즉 BST의 중위 순회 결과는 항상 오름차순 정렬이에요.</div>
+    <div class="point"><b>시험 포인트</b> — "이진 탐색 트리를 중위 순회하면?" → <b>오름차순으로 정렬된 결과</b>. 단골 문제입니다.</div>
+  </section>
+
+  <section>
+    <h2>3. BST에서 찾기와 지우기</h2>
+    <p><b>탐색</b>은 삽입과 똑같아요. 뿌리부터 크다/작다를 비교해 한쪽으로만 내려갑니다. 트리의 높이만큼만 비교하면 되니 평균 <b>O(log₂n)</b>이에요.</p>
+    <p><b>삭제</b>는 지우려는 노드의 자식 수에 따라 세 가지 경우로 나뉩니다.</p>
+    <table>
+      <tr><th>자식 수</th><th>처리 방법</th></tr>
+      <tr><td>0개 (잎 노드)</td><td>그냥 떼어냄</td></tr>
+      <tr><td>1개</td><td>자식을 내 자리로 끌어올림</td></tr>
+      <tr><td>2개</td><td><b>왼쪽 서브트리의 가장 큰 값</b> 또는 <b>오른쪽 서브트리의 가장 작은 값</b>을 내 자리에 올림</td></tr>
+    </table>
+    <div class="easy"><b>왜 그 값일까</b> — 내 자리에 올 수 있는 값은 "나와 가장 가까운 값"이어야 BST 규칙이 깨지지 않아요. 나보다 조금 작은 값(왼쪽에서 최대) 또는 조금 큰 값(오른쪽에서 최소)이 바로 그것이죠.</div>
+    <div class="point"><b>시험 포인트</b> — BST에서 <b>가장 작은 값은 왼쪽으로만 계속 내려간 끝</b>, <b>가장 큰 값은 오른쪽으로만 계속 내려간 끝</b>에 있습니다.</div>
+  </section>
+
+  <section>
+    <h2>4. BST의 치명적 약점 — 한쪽으로 기울어진 트리</h2>
+    <p>BST는 평균 O(log₂n)이지만, <b>최악의 경우 O(n)</b>까지 느려져요. 언제 그럴까요?</p>
+    <div class="easy"><b>최악의 상황</b> — 빈 트리에 <b>10, 20, 30, 40, 50</b>처럼 <b>이미 정렬된 순서</b>로 넣으면? 모두 오른쪽 자식으로만 매달려서 <b>일직선 막대기</b>가 됩니다. 이러면 트리가 아니라 그냥 연결 리스트와 같아서, 찾을 때 n번을 다 훑어야 해요.</div>
+    <p>이렇게 한쪽으로 쏠린 트리를 <b>편향 트리</b>(Skewed Tree) 또는 사향 트리라고 불러요. 트리 탐색이 빠른 이유는 '높이가 낮아서'인데, 편향 트리는 높이가 n-1이 되어 장점이 사라집니다.</p>
+    <div class="point"><b>시험 포인트</b> — "이진 탐색 트리의 최악 시간 복잡도는?" → <b>O(n)</b>. 원인은 <b>편향 트리</b>이고, 이미 정렬된 자료를 순서대로 삽입할 때 발생합니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 균형 트리 — 기울어지면 스스로 바로잡는다</h2>
+    <p>편향 문제를 막기 위해, 삽입·삭제할 때마다 <b>스스로 모양을 바로잡아 높이를 낮게 유지</b>하는 트리들이 만들어졌어요. 이를 <b>균형 이진 탐색 트리</b>라고 합니다.</p>
+    <table>
+      <tr><th>이름</th><th>균형을 잡는 방법</th><th>주요 쓰임</th></tr>
+      <tr><td>AVL 트리</td><td>왼쪽·오른쪽 높이 차이를 <b>-1, 0, 1</b>만 허용. 벗어나면 <b>회전</b>(Rotation)으로 바로잡음</td><td>탐색이 아주 많은 경우</td></tr>
+      <tr><td>레드-블랙 트리</td><td>노드에 빨강·검정 색을 부여하고 색 규칙으로 균형 유지</td><td>삽입·삭제가 잦은 경우</td></tr>
+      <tr><td>B-트리 / B+트리</td><td>한 노드에 여러 값과 여러 자식을 두어 높이를 매우 낮게 유지</td><td><b>데이터베이스 인덱스</b>, 파일 시스템</td></tr>
+    </table>
+    <div class="easy"><b>AVL의 균형 인수</b> — 어떤 노드의 (왼쪽 높이 − 오른쪽 높이)를 <b>균형 인수</b>(Balance Factor)라고 해요. 이 값이 -1·0·1 중 하나면 균형, <b>절댓값이 2 이상이면 불균형</b>이라 회전을 실시합니다.</div>
+    <div class="point"><b>시험 포인트</b> — ① AVL 트리는 <b>균형 인수의 절댓값이 1 이하</b>여야 한다 ② 균형이 깨지면 <b>회전</b>으로 복구한다 ③ <b>B-트리는 데이터베이스 인덱스</b>에 쓰인다 — 세 문장만 기억하면 충분합니다. B-트리는 3과목(데이터베이스)에서 다시 만나요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 이진 탐색 트리(BST)의 정의로 올바른 것은?",
+  o:["왼쪽 서브트리의 모든 값이 루트보다 크고, 오른쪽은 작다", "왼쪽 서브트리의 모든 값이 루트보다 작고, 오른쪽은 크다", "모든 잎 노드의 높이가 같다", "자식 노드를 3개까지 가질 수 있다"],
+  a:1, e:"왼쪽 < 루트 < 오른쪽 이 BST의 유일한 규칙입니다."},
+ {q:"2. 이진 탐색 트리를 중위 순회한 결과는?",
+  o:["오름차순으로 정렬된 값", "내림차순으로 정렬된 값", "삽입한 순서와 같은 값", "무작위 순서의 값"],
+  a:0, e:"왼쪽 → 루트 → 오른쪽 순서라서 항상 작은 값부터 나옵니다."},
+ {q:"3. 빈 이진 탐색 트리에 50, 30, 70, 20 순서로 삽입했을 때 20의 위치는?",
+  o:["50의 오른쪽 자식", "30의 왼쪽 자식", "30의 오른쪽 자식", "70의 왼쪽 자식"],
+  a:1, e:"20 < 50 → 왼쪽(30), 20 < 30 → 왼쪽. 따라서 30의 왼쪽 자식입니다."},
+ {q:"4. 이진 탐색 트리에서 가장 작은 값이 있는 위치는?",
+  o:["루트", "오른쪽으로만 계속 내려간 끝", "왼쪽으로만 계속 내려간 끝", "트리의 가운데"],
+  a:2, e:"작은 값은 항상 왼쪽에 있으므로 왼쪽 끝이 최솟값입니다."},
+ {q:"5. 이진 탐색 트리의 평균 탐색 시간 복잡도는?",
+  o:["O(1)", "O(log₂n)", "O(n)", "O(n²)"],
+  a:1, e:"트리의 높이만큼 비교하므로 균형 잡힌 경우 O(log₂n)입니다."},
+ {q:"6. 이진 탐색 트리에 이미 정렬된 자료를 순서대로 삽입하면 생기는 문제는?",
+  o:["트리가 한쪽으로 기울어져 탐색이 O(n)이 된다", "트리가 완전 이진 트리가 되어 더 빨라진다", "중복 값이 자동으로 삭제된다", "루트가 계속 바뀐다"],
+  a:0, e:"편향 트리(사향 트리)가 되어 연결 리스트처럼 느려집니다."},
+ {q:"7. 이진 탐색 트리의 최악의 경우 시간 복잡도는?",
+  o:["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+  a:2, e:"편향 트리가 되면 n개를 모두 비교해야 하므로 O(n)입니다."},
+ {q:"8. 왼쪽과 오른쪽 서브트리의 높이 차이를 1 이하로 유지하며, 균형이 깨지면 회전으로 바로잡는 트리는?",
+  o:["AVL 트리", "포화 이진 트리", "힙", "편향 트리"],
+  a:0, e:"AVL 트리입니다. 균형 인수(왼쪽 높이 - 오른쪽 높이)를 -1, 0, 1로 제한합니다."},
+ {q:"9. 한 노드에 여러 개의 값과 자식을 두어 트리 높이를 낮게 유지하며, 데이터베이스 인덱스에 주로 사용되는 트리는?",
+  o:["이진 트리", "B-트리", "AVL 트리", "스택"],
+  a:1, e:"B-트리·B+트리는 디스크 접근 횟수를 줄여야 하는 DB 인덱스에 쓰입니다."},
+ {q:"10. (복습) 정렬되어 있지 않은 자료에도 사용할 수 있는 탐색 방법은?",
+  o:["이진 탐색", "보간 탐색", "피보나치 탐색", "순차 탐색"],
+  a:3, e:"순차 탐색은 앞에서부터 하나씩 비교하므로 정렬이 필요 없습니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

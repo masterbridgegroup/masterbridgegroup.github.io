@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 46 · 해싱 ② — 오버플로 해결과 파일 구조</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 46 · 2과목 소프트웨어 개발</span>
+    <h1>해싱 ② — 오버플로 해결과 파일 구조</h1>
+    <p>2026-08-18 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 45)는 해싱의 기본을 배웠어요. 딱 하나만 다시: <b>해시 함수로 주소를 계산하니 탐색이 O(1)</b>, 하지만 서로 다른 키가 같은 주소를 받는 <b>충돌</b>과 자리가 없어지는 <b>오버플로</b>가 골칫거리였죠. 오늘은 그 오버플로를 어떻게 해결하는지, 그리고 파일을 저장하는 방식까지 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 오버플로 해결법 ① — 개방 주소법</h2>
+    <p>버킷이 꽉 찼을 때 해결 전략은 크게 두 갈래예요. <b>"빈 옆자리를 찾아 들어간다"</b>가 첫 번째, <b>"내 칸에 연결 고리를 달아 매단다"</b>가 두 번째입니다.</p>
+    <p><b>개방 주소법</b>(Open Addressing)은 첫 번째 전략이에요. <b>선형 조사법</b>(Linear Probing)이라고도 합니다.</p>
+    <div class="easy"><b>비유</b> — 지정 좌석이 5번인데 누가 앉아 있다면, 6번 → 7번 → 8번… 순서로 <b>비어 있는 다음 자리</b>를 찾아 앉는 거예요. 테이블 끝에 도달하면 다시 맨 앞(0번)으로 돌아가 찾습니다.</div>
+    <p>방법이 단순하고 추가 메모리가 필요 없지만 단점이 있어요. 데이터가 특정 구간에 <b>줄줄이 뭉쳐 쌓이는 현상</b>이 생기는데, 이를 <b>클러스터링</b>(집단화)이라고 합니다. 뭉치면 빈자리를 찾아 더 멀리 가야 하니 점점 느려지죠.</p>
+    <table>
+      <tr><th>조사 방식</th><th>다음 자리를 정하는 규칙</th></tr>
+      <tr><td>선형 조사법</td><td>+1, +2, +3 … 한 칸씩 옆으로</td></tr>
+      <tr><td>이차 조사법</td><td>+1², +2², +3² … 제곱만큼 건너뛰어 뭉침을 줄임</td></tr>
+      <tr><td>이중 해싱법</td><td>두 번째 해시 함수로 이동 폭을 계산해 더 고르게 흩뿌림</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "충돌이 발생하면 비어 있는 다음 버킷을 찾아 저장하는 방법" = <b>개방 주소법(선형 조사법)</b>. 단점은 <b>클러스터링(집단화)</b>입니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 오버플로 해결법 ② — 체이닝</h2>
+    <p><b>체이닝</b>(Chaining, 폐쇄 주소법)은 두 번째 전략이에요. 버킷마다 <b>연결 리스트</b>를 매달아, 같은 주소가 나온 데이터를 그 리스트에 계속 이어 붙입니다.</p>
+    <div class="easy"><b>비유</b> — 우편함 5번 칸이 꽉 찼다고 옆 칸을 쓰지 않아요. 대신 5번 칸에 <b>서류철을 달아</b> 계속 끼워 넣는 거예요. 자리는 무한정 늘어나지만, 5번 칸의 서류가 많아지면 그 안에서는 <b>하나씩 순차 탐색</b>을 해야 합니다.</div>
+    <table>
+      <tr><th>비교</th><th>개방 주소법</th><th>체이닝</th></tr>
+      <tr><td>저장 위치</td><td>테이블 내부의 다른 빈 칸</td><td>해당 버킷에 매단 연결 리스트</td></tr>
+      <tr><td>추가 메모리</td><td>필요 없음</td><td>포인터(연결 고리)만큼 필요</td></tr>
+      <tr><td>약점</td><td>클러스터링으로 점점 느려짐</td><td>한 버킷에 쏠리면 리스트가 길어져 느려짐</td></tr>
+      <tr><td>테이블이 꽉 차면</td><td>더 이상 저장 불가</td><td>계속 저장 가능</td></tr>
+    </table>
+    <p>그 밖에 <b>재해싱</b>(다른 해시 함수를 한 번 더 적용)과 <b>오버플로 구역을 따로 두는 방법</b>도 있습니다.</p>
+    <div class="point"><b>시험 포인트</b> — 체이닝은 <b>연결 리스트로 동거자를 연결</b>하는 방법. "오버플로가 발생하면 연결 리스트에 이어서 저장"이라는 문장이 보이면 체이닝입니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 적재 밀도 — 테이블을 얼마나 채워야 하나</h2>
+    <p><b>적재 밀도</b>(Load Factor)는 해시 테이블이 <b>얼마나 찼는지를 나타내는 비율</b>이에요.</p>
+    <div class="easy"><b>공식</b> — 적재 밀도 = <b>저장된 데이터 수 ÷ 전체 저장 가능 공간</b>. 100칸 테이블에 70개가 들어 있으면 0.7(70%)이에요.</div>
+    <p>밀도가 높아질수록 충돌 확률이 급격히 올라가서 O(1)이던 속도가 무너집니다. 그래서 실무에서는 보통 <b>0.7~0.75</b>를 넘기면 테이블 크기를 2배로 늘리고 전체를 다시 해싱해요(리해싱).</p>
+    <div class="point"><b>시험 포인트</b> — 적재 밀도가 <b>낮으면</b> 충돌은 적지만 <b>공간 낭비</b>, <b>높으면</b> 공간은 절약되지만 <b>충돌 증가</b>. 이 맞교환(trade-off) 관계를 묻는 문제가 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 파일 구조 — 데이터를 디스크에 배치하는 3가지 방식</h2>
+    <p>지금까지는 메모리 안의 자료구조를 봤어요. 이제 <b>디스크(하드디스크·SSD) 위 파일</b>을 어떻게 배치하느냐를 봅니다. 시험에서는 딱 3가지가 나와요.</p>
+    <table>
+      <tr><th>구조</th><th>저장 방식</th><th>장점</th><th>단점</th></tr>
+      <tr><td><b>순차 파일</b><br>(Sequential)</td><td>레코드를 들어온 순서대로 <b>차례차례</b> 저장</td><td>구조가 단순, 저장 공간 효율 최고, 일괄 처리에 유리</td><td>중간 삽입·삭제가 어렵고, 특정 레코드 검색이 느림</td></tr>
+      <tr><td><b>색인 순차 파일</b><br>(Indexed Sequential)</td><td>순차 저장 + 위치를 알려주는 <b>색인(인덱스)</b>을 따로 둠</td><td>순차 처리와 직접 검색 <b>둘 다</b> 가능</td><td>색인 저장 공간이 추가로 필요, 색인 관리 부담</td></tr>
+      <tr><td><b>직접 파일</b><br>(Direct, 랜덤 파일)</td><td><b>해싱</b>으로 주소를 계산해 그 위치에 바로 저장</td><td>특정 레코드 접근이 가장 빠름</td><td>충돌 처리 필요, 순차 처리·공간 효율이 떨어짐</td></tr>
+    </table>
+    <div class="easy"><b>비유로 정리</b> — 순차 파일은 <b>일기장</b>(앞에서부터 읽어야 함), 색인 순차 파일은 <b>목차가 있는 책</b>(목차로 바로 펼치거나 처음부터 읽어도 됨), 직접 파일은 <b>사물함</b>(번호만 알면 바로 열기).</div>
+    <div class="point"><b>시험 포인트</b> — 색인 순차 파일의 구성 영역 3개: <b>기본 구역</b>(실제 데이터) · <b>색인 구역</b>(위치 정보) · <b>오버플로 구역</b>(넘친 데이터). 그리고 "순차 접근과 직접 접근이 모두 가능한 파일 구조는?" → <b>색인 순차 파일</b>입니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 이번 주 탐색 방법 총정리표</h2>
+    <p>Day 43~46에서 배운 탐색을 한 표로 묶었어요. 이 표만 외워도 이번 주 시험 문제는 대부분 풀립니다.</p>
+    <table>
+      <tr><th>방법</th><th>평균 속도</th><th>정렬 필요</th><th>핵심 한 줄</th></tr>
+      <tr><td>순차 탐색</td><td>O(n)</td><td>❌</td><td>앞에서부터 하나씩, 평균 (n+1)/2회 비교</td></tr>
+      <tr><td>이진 탐색</td><td>O(log₂n)</td><td>⭕</td><td>가운데와 비교해 범위를 절반씩 버림</td></tr>
+      <tr><td>보간 탐색</td><td>O(log log n)</td><td>⭕</td><td>값의 크기에 비례해 위치를 추정</td></tr>
+      <tr><td>이진 탐색 트리</td><td>O(log₂n)<br>(최악 O(n))</td><td>트리가 규칙 유지</td><td>왼쪽 &lt; 루트 &lt; 오른쪽, 편향되면 느려짐</td></tr>
+      <tr><td>해싱</td><td>O(1)</td><td>❌</td><td>주소를 계산해 바로 접근, 충돌 처리 필요</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — 시험에서 가장 자주 묻는 비교는 두 쌍입니다. ① <b>정렬 필요 없는 것</b>: 순차 탐색·해싱 ② <b>가장 빠른 것</b>: 해싱 O(1). 내일은 데이터베이스 개요로 넘어갑니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 충돌이 발생했을 때 비어 있는 다음 버킷을 차례로 찾아 저장하는 오버플로 해결 방법은?",
+  o:["체이닝", "개방 주소법(선형 조사법)", "재해싱", "폴딩법"],
+  a:1, e:"개방 주소법은 옆자리로 한 칸씩 옮겨 가며 빈 곳을 찾습니다."},
+ {q:"2. 개방 주소법의 단점으로, 데이터가 특정 구간에 몰려 쌓이는 현상을 무엇이라 하는가?",
+  o:["클러스터링(집단화)", "오버플로", "동거자", "적재 밀도"],
+  a:0, e:"클러스터링이 생기면 빈자리를 찾아 더 멀리 가야 해 느려집니다."},
+ {q:"3. 같은 주소를 갖는 데이터들을 연결 리스트로 이어 붙여 저장하는 방법은?",
+  o:["선형 조사법", "이차 조사법", "체이닝", "기수 변환법"],
+  a:2, e:"체이닝(Chaining)은 버킷에 연결 리스트를 매달아 동거자를 연결합니다."},
+ {q:"4. 해시 테이블의 적재 밀도(Load Factor)를 구하는 식은?",
+  o:["저장된 데이터 수 ÷ 전체 저장 공간", "전체 저장 공간 ÷ 저장된 데이터 수", "버킷 수 × 슬롯 수", "충돌 횟수 ÷ 키 개수"],
+  a:0, e:"채워진 비율이므로 데이터 수를 전체 공간으로 나눕니다."},
+ {q:"5. 적재 밀도가 높아질 때 나타나는 현상은?",
+  o:["충돌 확률이 낮아진다", "충돌 확률이 높아진다", "저장 공간이 낭비된다", "탐색이 항상 O(1)로 유지된다"],
+  a:1, e:"테이블이 꽉 찰수록 같은 주소가 겹칠 확률이 올라갑니다."},
+ {q:"6. 레코드를 들어온 순서대로 차례차례 저장하여 저장 공간 효율이 가장 좋은 파일 구조는?",
+  o:["순차 파일", "색인 순차 파일", "직접 파일", "해시 파일"],
+  a:0, e:"순차 파일은 구조가 단순하고 공간 낭비가 없지만 중간 삽입·삭제가 어렵습니다."},
+ {q:"7. 순차 접근과 직접 접근이 모두 가능한 파일 구조는?",
+  o:["순차 파일", "색인 순차 파일", "직접 파일", "이진 파일"],
+  a:1, e:"색인 순차 파일은 색인으로 바로 찾을 수도, 처음부터 순서대로 읽을 수도 있습니다."},
+ {q:"8. 색인 순차 파일을 구성하는 영역이 아닌 것은?",
+  o:["기본 구역", "색인 구역", "오버플로 구역", "정렬 구역"],
+  a:3, e:"기본·색인·오버플로 구역 3개로 구성됩니다. 정렬 구역은 없습니다."},
+ {q:"9. 해싱을 이용해 레코드의 주소를 계산하여 저장하는 파일 구조는?",
+  o:["순차 파일", "색인 순차 파일", "직접 파일", "텍스트 파일"],
+  a:2, e:"직접(랜덤) 파일은 해시 함수로 주소를 계산해 그 위치에 바로 저장합니다."},
+ {q:"10. (복습) 서로 다른 키가 같은 해시 주소를 갖는 현상과, 그 키들을 가리키는 용어를 바르게 짝지은 것은?",
+  o:["충돌 - 동거자(Synonym)", "오버플로 - 버킷", "클러스터링 - 슬롯", "재해싱 - 인덱스"],
+  a:0, e:"주소가 겹치는 현상이 충돌이고, 겹친 키들을 동거자라고 부릅니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>
