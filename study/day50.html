@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 50 · 형상 관리 ① — 변경 이력을 기록하는 기술</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 50 · 2과목 소프트웨어 개발</span>
+    <h1>형상 관리 ① — 변경 이력을 기록하는 기술</h1>
+    <p>2026-08-22 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 49)는 2주차 종합 테스트를 봤어요. 딱 하나만 다시: <b>이진 탐색은 정렬된 자료에만 쓸 수 있고 O(log₂n)</b>, <b>해싱은 주소를 계산해 O(1)</b>로 찾는다는 점이었죠. 마지막 문제에서 <b>Git이 형상 관리 도구</b>라고 나왔는데, 오늘부터 그 형상 관리를 본격적으로 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 형상 관리란? — 소프트웨어의 변경 일지</h2>
+    <p><b>형상 관리</b>(SCM, Software Configuration Management)는 소프트웨어를 개발하는 동안 생기는 <b>모든 산출물의 변경 사항을 기록하고 통제하는 활동</b>이에요. "형상"(Configuration)은 어렵게 들리지만 <b>관리 대상이 되는 결과물</b>이라는 뜻입니다.</p>
+    <div class="easy"><b>비유</b> — 여러 사람이 하나의 보고서를 같이 쓴다고 생각해 보세요. 누가 언제 무엇을 고쳤는지 기록해 두지 않으면, 어제 잘 되던 내용이 사라지거나 두 사람이 서로의 수정을 덮어써 버립니다. 형상 관리는 이 <b>수정 일지와 되돌리기(Undo) 기능</b>을 소프트웨어 전체에 적용하는 일이에요.</div>
+    <p>중요한 점은 <b>소스 코드만 관리 대상이 아니라는 것</b>이에요.</p>
+    <table>
+      <tr><th>관리 대상(형상 항목)</th><th>예시</th></tr>
+      <tr><td>개발 문서</td><td>요구사항 명세서, 설계서, 시험 계획서</td></tr>
+      <tr><td>소스 코드</td><td>프로그램 원본 코드</td></tr>
+      <tr><td>실행 파일</td><td>컴파일 결과물, 라이브러리</td></tr>
+      <tr><td>관련 자료</td><td>사용자 매뉴얼, 데이터베이스 구조 정의서</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "형상 관리의 대상은 소스 코드뿐이다"라는 보기는 <b>틀린 문장</b>입니다. <b>개발 과정에서 나오는 모든 산출물(문서 포함)</b>이 대상이에요. 이 함정이 매우 자주 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 베이스라인 — 기준이 되는 저장 시점</h2>
+    <p><b>베이스라인</b>(Baseline, 기준선)은 개발 과정 중 어느 시점에 <b>정식으로 검토·승인되어 고정된 산출물</b>을 말해요. 이 시점 이후에는 <b>정해진 절차 없이는 함부로 바꿀 수 없습니다</b>.</p>
+    <div class="easy"><b>비유</b> — 게임에서 <b>세이브 포인트</b>와 같아요. "여기까지는 확실히 맞다"고 도장을 찍어 저장해 두는 지점입니다. 이후 문제가 생기면 이 세이브 포인트로 되돌아갈 수 있고, 여기서부터 무엇이 바뀌었는지도 정확히 알 수 있죠.</div>
+    <p>보통 개발 단계마다 베이스라인을 설정합니다.</p>
+    <table>
+      <tr><th>베이스라인</th><th>확정되는 시점</th></tr>
+      <tr><td>기능 베이스라인</td><td>요구사항 분석이 끝나 <b>요구사항 명세서</b>가 승인된 때</td></tr>
+      <tr><td>설계 베이스라인</td><td>설계가 끝나 <b>설계서</b>가 승인된 때</td></tr>
+      <tr><td>제품 베이스라인</td><td>개발이 끝나 <b>제품(실행 파일)</b>이 승인된 때</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "개발 과정의 특정 시점에서 <b>변경을 통제하기 위한 기준</b>이 되는 것"의 답은 <b>베이스라인(기준선)</b>입니다. 단어 그대로 물어보는 문제가 자주 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 형상 관리 4대 활동 — 식·통·감·기</h2>
+    <p>형상 관리는 네 가지 활동으로 이루어져요. <b>순서까지 외워야</b> 합니다.</p>
+    <table>
+      <tr><th>순서</th><th>활동</th><th>하는 일</th></tr>
+      <tr><td>①</td><td><b>형상 식별</b><br>(Identification)</td><td>관리할 대상에 <b>이름과 번호(식별자)를 붙여</b> 목록을 만듦. 베이스라인의 기준이 됨</td></tr>
+      <tr><td>②</td><td><b>형상 통제</b><br>(Control)</td><td>변경 요청을 받아 <b>검토·승인하고 반영</b>. 승인 없는 변경을 막음</td></tr>
+      <tr><td>③</td><td><b>형상 감사</b><br>(Audit)</td><td>변경이 <b>요구사항대로 제대로 반영됐는지 검증</b></td></tr>
+      <tr><td>④</td><td><b>형상 기록</b><br>(Status Accounting, 상태 보고)</td><td>변경 과정과 결과를 <b>문서로 기록해 관계자에게 보고</b></td></tr>
+    </table>
+    <div class="easy"><b>외우는 법</b> — <b>"식별 → 통제 → 감사 → 기록"</b>을 <b>"식·통·감·기"</b>로 묶어 두세요. 이름을 붙이고(식), 바꿀지 결정하고(통), 제대로 됐나 확인하고(감), 적어 남긴다(기)는 자연스러운 순서예요.</div>
+    <div class="point"><b>시험 포인트</b> — 4대 활동 중 <b>순서를 묻는 문제</b>와 <b>"형상 감사"의 뜻</b>을 묻는 문제가 핵심입니다. 형상 감사는 <b>변경이 올바르게 됐는지 확인하는 검증 활동</b>이며, 기록·보고하는 것은 형상 기록입니다. 둘을 바꿔 놓은 보기에 주의하세요.</div>
+  </section>
+
+  <section>
+    <h2>4. 형상 통제 위원회(CCB)와 변경 처리 흐름</h2>
+    <p>변경 요청이 들어왔을 때 아무나 마음대로 고치면 안 되므로, <b>형상 통제 위원회</b>(CCB, Configuration Control Board)라는 의사 결정 조직이 승인 여부를 판단해요.</p>
+    <table>
+      <tr><th>단계</th><th>내용</th></tr>
+      <tr><td>1. 변경 요청</td><td>오류 수정·기능 추가 등의 요청서를 제출</td></tr>
+      <tr><td>2. 영향 평가</td><td>바꾸면 <b>어디까지 영향</b>이 가는지, 비용·일정은 어떤지 분석</td></tr>
+      <tr><td>3. 승인 / 기각</td><td><b>CCB</b>가 판단해 승인하거나 거절</td></tr>
+      <tr><td>4. 변경 수행</td><td>승인된 것만 반영하고 <b>새 버전</b>을 만듦</td></tr>
+      <tr><td>5. 검증 및 기록</td><td>제대로 됐는지 확인(감사)하고 이력을 남김(기록)</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 아파트에서 벽을 허물려면 관리사무소의 허가가 필요하죠. CCB가 그 <b>관리사무소</b> 역할이고, "이 벽 허물면 윗집 바닥이 무너질까?"를 따지는 게 <b>영향 평가</b>예요.</div>
+    <div class="point"><b>시험 포인트</b> — 변경 관리에서 가장 중요한 단계는 <b>영향 평가(영향 분석)</b>입니다. 또 <b>승인되지 않은 변경은 반영하지 않는다</b>는 원칙이 자주 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>5. 형상 관리를 하면 무엇이 좋을까</h2>
+    <table>
+      <tr><th>이점</th><th>설명</th></tr>
+      <tr><td>변경 이력 추적</td><td><b>누가·언제·왜</b> 고쳤는지 알 수 있어 문제 원인을 빨리 찾음</td></tr>
+      <tr><td>이전 버전 복구</td><td>잘못 고쳤을 때 <b>예전 상태로 되돌리기</b> 가능</td></tr>
+      <tr><td>동시 작업 가능</td><td>여러 개발자가 같은 프로젝트를 <b>덮어쓰기 걱정 없이</b> 작업</td></tr>
+      <tr><td>중복·누락 방지</td><td>같은 일을 두 번 하거나 빠뜨리는 실수를 줄임</td></tr>
+      <tr><td>가시성 확보</td><td>프로젝트 진행 상황을 <b>수치와 기록으로 확인</b></td></tr>
+    </table>
+    <div class="easy"><b>내일 예고</b> — Day 51에서는 이 형상 관리를 실제로 해 주는 <b>버전 관리 도구</b>(공유 폴더 방식 · 클라이언트/서버 방식 · 분산 저장소 방식)를 배웁니다.</div>
+    <div class="point"><b>시험 포인트</b> — 형상 관리의 목적을 묻는 문제에서 <b>"프로그램의 실행 속도를 높인다"</b> 같은 성능 관련 보기는 항상 오답입니다. 형상 관리는 <b>변경의 추적·통제</b>가 목적이에요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 소프트웨어 개발 과정에서 발생하는 산출물의 변경 사항을 관리하고 통제하는 활동은?",
+  o:["형상 관리", "테스트 관리", "일정 관리", "품질 보증"],
+  a:0, e:"형상 관리(SCM, Software Configuration Management)입니다."},
+ {q:"2. 형상 관리의 대상에 대한 설명으로 옳은 것은?",
+  o:["소스 코드만 관리한다", "실행 파일만 관리한다", "요구사항 명세서·설계서 등 문서까지 포함해 관리한다", "데이터베이스만 관리한다"],
+  a:2, e:"개발 과정에서 생성되는 모든 산출물(문서·소스 코드·실행 파일·매뉴얼 등)이 형상 관리 대상입니다."},
+ {q:"3. 개발 과정의 특정 시점에서 정식으로 검토·승인되어 이후 변경 통제의 기준이 되는 것은?",
+  o:["프로토타입", "베이스라인(기준선)", "체크리스트", "마일스톤 보고서"],
+  a:1, e:"베이스라인(Baseline)이며 게임의 세이브 포인트와 같은 역할을 합니다."},
+ {q:"4. 형상 관리의 4대 활동 순서로 올바른 것은?",
+  o:["형상 통제 → 형상 식별 → 형상 기록 → 형상 감사", "형상 식별 → 형상 통제 → 형상 감사 → 형상 기록", "형상 감사 → 형상 통제 → 형상 식별 → 형상 기록", "형상 기록 → 형상 식별 → 형상 통제 → 형상 감사"],
+  a:1, e:"식별 → 통제 → 감사 → 기록, 즉 '식·통·감·기' 순서입니다."},
+ {q:"5. 관리 대상에 이름과 식별자를 부여하여 관리 목록을 만드는 형상 관리 활동은?",
+  o:["형상 식별", "형상 통제", "형상 감사", "형상 기록"],
+  a:0, e:"형상 식별(Identification)은 무엇을 관리할지 정하고 이름을 붙이는 첫 단계입니다."},
+ {q:"6. 변경이 요구사항에 맞게 올바르게 반영되었는지 검증하는 형상 관리 활동은?",
+  o:["형상 식별", "형상 통제", "형상 감사", "형상 기록"],
+  a:2, e:"형상 감사(Audit)입니다. 변경 과정을 문서로 남기고 보고하는 것은 형상 기록입니다."},
+ {q:"7. 변경 요청의 승인 여부를 심의·결정하는 조직은?",
+  o:["CCB(형상 통제 위원회)", "QA 팀", "CAB 감리단", "PMO 사무국"],
+  a:0, e:"CCB(Configuration Control Board), 즉 형상 통제 위원회가 변경 승인 여부를 결정합니다."},
+ {q:"8. 변경 관리 절차에서 변경을 승인하기 전에 반드시 수행해야 하는 것은?",
+  o:["최종 사용자 교육", "변경의 영향 평가(영향 분석)", "소스 코드 삭제", "베이스라인 해제"],
+  a:1, e:"변경이 다른 부분과 비용·일정에 미치는 영향을 먼저 분석한 뒤 승인 여부를 판단합니다."},
+ {q:"9. 형상 관리의 기대 효과로 적절하지 않은 것은?",
+  o:["변경 이력의 추적이 쉬워진다", "이전 버전으로 복구할 수 있다", "여러 개발자의 동시 작업이 가능해진다", "프로그램의 실행 속도가 빨라진다"],
+  a:3, e:"형상 관리는 변경의 추적·통제를 위한 활동이며 프로그램 실행 성능과는 관계가 없습니다."},
+ {q:"10. (복습) 프로세스 간 통신(IPC) 방식 중 같은 메모리 영역을 함께 사용하는 가장 빠른 방식은?",
+  o:["소켓", "파이프", "공유 메모리", "메시지 큐"],
+  a:2, e:"공유 메모리(Shared Memory)입니다. 공동 칠판처럼 같은 메모리를 함께 읽고 씁니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

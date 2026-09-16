@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 54 · 제품 소프트웨어 패키징 — 릴리즈 노트와 DRM</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 54 · 2과목 소프트웨어 개발</span>
+    <h1>제품 소프트웨어 패키징 — 릴리즈 노트와 DRM</h1>
+    <p>2026-08-26 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 53)는 빌드 자동화를 배웠어요. 딱 하나만 다시: <b>Ant(의존성 관리 없음) · Maven(pom.xml) · Gradle(Groovy, 안드로이드)</b>이 빌드 3형제이고, <b>Jenkins는 Java 기반 웹 GUI 빌드 자동화 서버</b>였죠. 오늘은 그렇게 만들어진 결과물을 <b>사용자에게 전달할 형태로 포장</b>하는 패키징을 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 제품 소프트웨어 패키징이란?</h2>
+    <p><b>패키징</b>(Packaging)은 개발이 끝난 소프트웨어를 <b>사용자가 설치하고 쓸 수 있는 형태로 묶어 배포하는 작업</b>이에요. 가장 중요한 원칙은 <b>개발자가 아니라 사용자 중심</b>이라는 점입니다.</p>
+    <table>
+      <tr><th>원칙</th><th>설명</th></tr>
+      <tr><td>사용자 중심</td><td>개발자의 편의가 아니라 <b>사용자가 쉽게 설치·사용</b>할 수 있게 구성</td></tr>
+      <tr><td>모듈화 기반</td><td>기능별로 <b>모듈 단위 빌드를 먼저</b> 한 뒤 묶음</td></tr>
+      <tr><td>반복 배포</td><td>한 번에 끝내지 않고 <b>버전이 올라갈 때마다 주기적으로</b> 패키징</td></tr>
+      <tr><td>다양한 환경 지원</td><td>여러 <b>운영체제·기기</b>에서 설치될 수 있게 고려</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 케이크를 다 만들었다고 끝이 아니죠. <b>상자에 담고, 보관 방법을 적고, 포크를 넣어 주는</b> 일이 패키징이에요. 손님이 집에서 문제없이 먹을 수 있게 하는 것이 목적입니다.</div>
+    <div class="point"><b>시험 포인트</b> — 패키징은 <b>사용자 중심</b>으로 진행하며, <b>모듈별로 빌드한 뒤</b> 패키징한다는 순서가 출제됩니다. "개발자 편의를 우선한다"는 보기는 오답입니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 패키징 시 고려 사항 4가지</h2>
+    <table>
+      <tr><th>고려 사항</th><th>내용</th></tr>
+      <tr><td><b>사용자 시스템 환경</b></td><td>운영체제, CPU, 메모리 등 <b>최소 실행 환경</b>을 반드시 정의</td></tr>
+      <tr><td><b>사용자 편의성(UI)</b></td><td>설치와 사용이 <b>직관적</b>이어야 하고, 오류 메시지도 알기 쉽게</td></tr>
+      <tr><td><b>하드웨어·소프트웨어 통합</b></td><td>다양한 <b>기기와 환경에서도 실행</b>되도록 종합 고려</td></tr>
+      <tr><td><b>관리 서비스 형태</b></td><td>설치 후 <b>업데이트·삭제·오류 관리</b>를 어떻게 제공할지 결정</td></tr>
+    </table>
+    <div class="easy"><b>최소 실행 환경이란?</b> — "이 프로그램을 돌리려면 <b>적어도 이 정도 사양은 필요합니다</b>"라고 알려 주는 기준이에요. 게임 상자에 적힌 "권장 사양"과 같습니다.</div>
+    <div class="point"><b>시험 포인트</b> — 4가지를 묻고 <b>"개발 언어의 선택"</b>이나 <b>"소스 코드 공개"</b> 같은 엉뚱한 보기를 끼워 넣는 형태로 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 릴리즈 노트 — 무엇이 바뀌었는지 알리는 문서</h2>
+    <p><b>릴리즈 노트</b>(Release Note)는 <b>이번 버전에서 무엇이 바뀌었는지 사용자에게 알려 주는 공식 문서</b>예요. 스마트폰 앱을 업데이트할 때 나오는 "이번 업데이트 내용" 화면이 바로 릴리즈 노트입니다.</p>
+    <table>
+      <tr><th>주요 항목</th><th>내용</th></tr>
+      <tr><td>머리말(Header)</td><td>문서 이름, <b>제품 이름, 버전 번호, 릴리즈 날짜</b>, 참고 문서</td></tr>
+      <tr><td>개요 / 목적</td><td>제품과 변경 사항의 <b>간략한 요약</b>, 이번 릴리즈의 목적</td></tr>
+      <tr><td>이슈 요약</td><td><b>수정된 오류</b>나 개선 요청 사항의 요약</td></tr>
+      <tr><td>재현 항목</td><td>오류가 <b>어떤 상황에서 발생했는지</b> 설명</td></tr>
+      <tr><td>수정·개선 내용</td><td>실제로 <b>고친 내용</b>을 구체적으로 기술</td></tr>
+      <tr><td>사용자 영향도</td><td>이 변경이 <b>사용자에게 미치는 영향</b></td></tr>
+      <tr><td>노트 / 면책 조항</td><td>설치 시 주의 사항, <b>법적 책임 한계</b> 안내</td></tr>
+      <tr><td>연락처</td><td>문제 발생 시 <b>문의할 곳</b></td></tr>
+    </table>
+    <p>릴리즈 노트는 다음 순서로 작성해요.</p>
+    <div class="easy"><b>작성 순서</b> — ① <b>모듈 식별</b>(무엇이 포함되나) → ② <b>릴리즈 정보 확인</b>(버전·날짜) → ③ <b>릴리즈 노트 개요 작성</b> → ④ <b>영향도 체크</b> → ⑤ <b>정식 릴리즈 노트 작성</b> → ⑥ <b>추가 개선 항목 식별</b>.</div>
+    <div class="point"><b>시험 포인트</b> — 릴리즈 노트는 <b>테스트를 완료하고 개발팀이 정리한 최종 내용을 기준으로</b> 작성합니다. 또 <b>추가 개선 항목이 발견되면 다음 릴리즈에 반영</b>한다는 점이 출제 포인트예요.</div>
+  </section>
+
+  <section>
+    <h2>4. DRM — 디지털 저작권을 지키는 기술</h2>
+    <p><b>DRM</b>(Digital Rights Management, 디지털 저작권 관리)은 <b>디지털 콘텐츠를 암호화해 허가받은 사용자만 쓸 수 있게 통제하는 기술</b>이에요. 패키징 단계에서 함께 적용합니다.</p>
+    <div class="easy"><b>비유</b> — 전자책을 사면 <b>내 계정에서만 열리고 친구에게 파일을 보내도 열리지 않죠</b>. 그것이 DRM이에요. 콘텐츠에 <b>자물쇠</b>를 걸고, 값을 낸 사람에게만 <b>열쇠</b>를 주는 구조입니다.</div>
+    <p>DRM의 구성 요소는 이름만 봐도 역할이 짐작되도록 정리해 둡시다.</p>
+    <table>
+      <tr><th>구성 요소</th><th>역할</th></tr>
+      <tr><td><b>클리어링 하우스</b><br>(Clearing House)</td><td>저작권 <b>사용 권한과 라이선스(이용 허가증)를 발급·관리</b>하고 사용료를 정산하는 <b>중심 기관</b></td></tr>
+      <tr><td>콘텐츠 제공자<br>(Contents Provider)</td><td>콘텐츠를 <b>만들어 제공</b>하는 저작권자</td></tr>
+      <tr><td><b>패키저</b><br>(Packager)</td><td>콘텐츠를 <b>암호화된 배포 형태로 묶는</b> 도구</td></tr>
+      <tr><td>콘텐츠 분배자<br>(Contents Distributor)</td><td>암호화된 콘텐츠를 <b>유통·판매</b> (예: 온라인 서점)</td></tr>
+      <tr><td>콘텐츠 소비자<br>(Consumer)</td><td>콘텐츠를 <b>구매해 사용</b>하는 사람</td></tr>
+      <tr><td><b>DRM 컨트롤러</b></td><td>사용자 기기에서 <b>권한을 확인해 재생을 허용·차단</b>하는 프로그램</td></tr>
+      <tr><td><b>보안 컨테이너</b></td><td>콘텐츠를 <b>안전하게 담아 전달</b>하는 암호화된 그릇</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — <b>클리어링 하우스</b>(라이선스 발급·정산)와 <b>패키저</b>(암호화 포장), <b>DRM 컨트롤러</b>(사용 권한 통제)의 역할을 서로 바꿔 놓은 보기가 단골입니다. 특히 "<b>저작권에 대한 사용 권한과 라이선스를 관리하는 곳</b>"의 답은 <b>클리어링 하우스</b>예요.</div>
+  </section>
+
+  <section>
+    <h2>5. DRM 기술 요소 7가지</h2>
+    <table>
+      <tr><th>기술 요소</th><th>내용</th></tr>
+      <tr><td><b>암호화</b>(Encryption)</td><td>콘텐츠와 라이선스를 <b>암호로 잠금</b></td></tr>
+      <tr><td><b>키 관리</b>(Key Management)</td><td>암호를 푸는 <b>열쇠를 안전하게 저장·배포</b></td></tr>
+      <tr><td><b>암호화 파일 생성</b>(Packager)</td><td>콘텐츠를 암호화된 <b>배포 파일로 만듦</b></td></tr>
+      <tr><td><b>식별 기술</b>(Identification)</td><td>콘텐츠에 <b>고유 번호</b>를 부여 (DOI, URI 등)</td></tr>
+      <tr><td><b>저작권 표현</b>(Rights Expression)</td><td>이용 조건을 <b>기계가 읽을 수 있는 언어로 표현</b> (XrML 등)</td></tr>
+      <tr><td><b>정책 관리</b>(Policy Management)</td><td>이용 규칙(기간·횟수·기기 수)을 <b>설정·관리</b></td></tr>
+      <tr><td><b>크랙 방지</b>(Tamper Resistance)</td><td>보호 장치를 <b>무력화하려는 시도를 차단</b></td></tr>
+    </table>
+    <div class="easy"><b>내일 예고</b> — Day 55에서는 사용자에게 함께 전달하는 <b>설치 매뉴얼·사용자 매뉴얼</b>과, 제품의 좋음을 재는 <b>국제 표준 품질 특성</b>을 배웁니다.</div>
+    <div class="point"><b>시험 포인트</b> — 용어를 짝짓는 문제가 많습니다. <b>DOI·URI = 식별 기술</b>, <b>XrML = 저작권 표현</b>, <b>크랙 방지 = Tamper Resistance</b>. 이 세 짝만 정확히 외워 두세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 제품 소프트웨어 패키징에 대한 설명으로 옳은 것은?",
+  o:["개발자의 편의를 최우선으로 구성한다", "사용자 중심으로 설치·사용이 쉽도록 구성한다", "소스 코드를 공개하는 것이 목적이다", "테스트를 생략하기 위한 단계다"],
+  a:1, e:"패키징은 사용자가 쉽게 설치하고 사용할 수 있도록 사용자 중심으로 진행합니다."},
+ {q:"2. 패키징 시 고려 사항으로 적절하지 않은 것은?",
+  o:["사용자 시스템 환경(최소 실행 환경) 정의", "사용자 편의성과 UI 고려", "설치 후 관리 서비스 형태 결정", "개발에 사용할 프로그래밍 언어 선정"],
+  a:3, e:"개발 언어 선정은 설계·구현 단계의 일이며 패키징 고려 사항이 아닙니다."},
+ {q:"3. 이번 버전에서 변경·수정된 내용을 사용자에게 알리기 위해 작성하는 문서는?",
+  o:["요구사항 명세서", "릴리즈 노트", "형상 감사 보고서", "테스트 케이스"],
+  a:1, e:"릴리즈 노트(Release Note)이며, 앱 업데이트 시 보이는 '이번 업데이트 내용'이 그 예입니다."},
+ {q:"4. 릴리즈 노트의 머리말(Header)에 포함되는 항목으로 가장 적절한 것은?",
+  o:["제품명·버전 번호·릴리즈 날짜", "소스 코드 전문", "데이터베이스 스키마 정의", "직원 인사 기록"],
+  a:0, e:"머리말에는 문서 이름, 제품명, 버전 번호, 릴리즈 날짜, 참고 문서 등이 들어갑니다."},
+ {q:"5. 릴리즈 노트 작성 순서에서 가장 먼저 수행하는 것은?",
+  o:["영향도 체크", "모듈 식별", "정식 릴리즈 노트 작성", "추가 개선 항목 식별"],
+  a:1, e:"모듈 식별 → 릴리즈 정보 확인 → 개요 작성 → 영향도 체크 → 정식 작성 → 추가 개선 항목 식별 순서입니다."},
+ {q:"6. 디지털 콘텐츠를 암호화하여 허가받은 사용자만 이용할 수 있도록 통제하는 기술은?",
+  o:["DRM(디지털 저작권 관리)", "DBMS", "CI/CD", "형상 관리"],
+  a:0, e:"DRM(Digital Rights Management)입니다."},
+ {q:"7. DRM 구성 요소 중 저작권에 대한 사용 권한과 라이선스를 발급·관리하고 사용료를 정산하는 것은?",
+  o:["패키저", "콘텐츠 분배자", "클리어링 하우스", "보안 컨테이너"],
+  a:2, e:"클리어링 하우스(Clearing House)가 라이선스 발급과 정산을 담당하는 중심 기관입니다."},
+ {q:"8. DRM 구성 요소 중 콘텐츠를 암호화된 배포 형태로 묶어 주는 도구는?",
+  o:["패키저(Packager)", "DRM 컨트롤러", "콘텐츠 제공자", "클리어링 하우스"],
+  a:0, e:"패키저(Packager)가 콘텐츠를 암호화해 배포 가능한 파일로 만듭니다."},
+ {q:"9. DRM 기술 요소 중 콘텐츠에 고유 번호를 부여하는 식별 기술에 해당하는 것은?",
+  o:["XrML", "DOI", "Tamper Resistance", "Key Management"],
+  a:1, e:"DOI·URI가 식별 기술입니다. XrML은 저작권 표현, Tamper Resistance는 크랙 방지 기술입니다."},
+ {q:"10. (복습) 빌드 자동화 도구 중 Groovy 기반 스크립트를 사용하는 것은?",
+  o:["Ant", "Maven", "Gradle", "Jenkins"],
+  a:2, e:"Gradle이며 build.gradle 파일을 사용하고 안드로이드 앱의 표준 빌드 도구입니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

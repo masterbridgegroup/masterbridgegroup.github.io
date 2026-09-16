@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 49 · 주간 복습 — 탐색·해싱·통합 구현 종합 테스트 (15문제)</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 49 · 2과목 소프트웨어 개발</span>
+    <h1>주간 복습 📚 — 탐색·해싱·통합 구현 종합 테스트 (15문제)</h1>
+    <p>2026-08-21 · 2과목 2주차 복습 + 종합 테스트 15문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 48)는 단위 모듈과 통합 구현을 배웠어요. 딱 하나만 다시: 좋은 모듈은 <b>결합도는 낮게, 응집도는 높게</b> 만들고, 프로그램끼리 대화하는 <b>IPC는 5종(공유 메모리·소켓·메시지 큐·파이프·RPC)</b>이었죠. 오늘은 이번 주(Day 43~48) 내용을 표로 압축 정리한 뒤, 종합 테스트 15문제로 마무리합니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 탐색 알고리즘 성적표</h2>
+    <p><b>탐색</b>(Search, 찾기)은 많은 자료 속에서 원하는 값을 찾아내는 방법이에요. 시간 복잡도(빠른 정도를 나타내는 기호)를 같이 외우는 것이 핵심입니다.</p>
+    <table>
+      <tr><th>방법</th><th>어떻게 찾나</th><th>시간 복잡도</th><th>조건</th></tr>
+      <tr><td><b>순차 탐색</b><br>(선형 탐색)</td><td>처음부터 하나씩 끝까지 확인</td><td>O(n)<br>평균 (n+1)/2회 비교</td><td>정렬 <b>불필요</b></td></tr>
+      <tr><td><b>이진 탐색</b></td><td>가운데를 보고 <b>절반씩 버림</b></td><td>O(log₂n)</td><td>정렬 <b>필수</b></td></tr>
+      <tr><td><b>이진 탐색 트리</b><br>(BST)</td><td>왼쪽은 작은 값, 오른쪽은 큰 값으로 내려감</td><td>평균 O(log₂n)<br>최악 O(n)</td><td>트리가 <b>한쪽으로 치우치면</b> 느려짐</td></tr>
+      <tr><td><b>해싱</b></td><td>주소를 <b>계산해서</b> 바로 찾아감</td><td>O(1)</td><td>충돌(Collision) 관리 필요</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 순차 탐색은 <b>책을 1쪽부터 넘기며</b> 찾기, 이진 탐색은 <b>사전을 반씩 펼쳐</b> 찾기, 해싱은 <b>사물함 번호를 계산해</b> 바로 열기입니다.</div>
+    <div class="point"><b>시험 포인트</b> — 이진 탐색은 "<b>반드시 정렬된 자료</b>에만 쓸 수 있다"가 최다 출제 문장이고, 이진 탐색 트리를 <b>중위 순회</b>(왼쪽→루트→오른쪽)하면 <b>오름차순으로 정렬</b>되어 나온다는 점도 단골입니다.</div>
+  </section>
+
+  <section>
+    <h2>2. 해싱 용어와 충돌 해결</h2>
+    <p>해싱은 <b>해싱 함수</b>(주소를 계산해 주는 식)로 <b>버킷</b>(자료를 담는 칸)의 주소를 구하는 방식이에요. 용어를 정확히 구분해 두어야 합니다.</p>
+    <table>
+      <tr><th>용어</th><th>쉬운 뜻</th></tr>
+      <tr><td><b>버킷</b>(Bucket)</td><td>하나의 주소가 가리키는 <b>저장 공간</b>. 여러 개의 슬롯으로 이루어짐</td></tr>
+      <tr><td><b>슬롯</b>(Slot)</td><td>버킷 안에서 <b>하나의 자료</b>가 들어가는 칸</td></tr>
+      <tr><td><b>충돌</b>(Collision)</td><td>서로 다른 자료가 <b>같은 주소</b>를 받은 상태</td></tr>
+      <tr><td><b>동의어</b>(Synonym)</td><td>같은 주소를 받은 <b>자료들의 집합</b></td></tr>
+      <tr><td><b>오버플로</b>(Overflow)</td><td>충돌이 생겼는데 버킷에 <b>빈 슬롯이 없어</b> 넣을 수 없는 상태</td></tr>
+    </table>
+    <p>해싱 함수의 종류와 충돌 해결 방법도 짝지어 외워 둡시다.</p>
+    <table>
+      <tr><th>구분</th><th>내용</th></tr>
+      <tr><td>해싱 함수</td><td><b>제산법</b>(소수로 나눈 나머지 — 대표), 제곱법, 폴딩법(접어서 더하기), 기수 변환법, 대수적 코딩법, 숫자 분석법(계수 분석법)</td></tr>
+      <tr><td>충돌 해결</td><td><b>개방 주소법</b>(선형 탐사 — 빈 자리를 찾아 옆으로 이동), <b>체이닝</b>(연결 리스트로 이어 붙임), 재해싱(다른 함수로 다시 계산)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — "가장 널리 쓰이는 해싱 함수는?" → <b>제산법(Division)</b>. "충돌은 발생했지만 저장할 곳이 없는 상태는?" → <b>오버플로</b>. 충돌과 오버플로를 바꿔치기한 보기가 자주 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>3. 파일 구조와 DB 개요</h2>
+    <table>
+      <tr><th>파일 구조</th><th>특징</th></tr>
+      <tr><td><b>순차 파일</b></td><td>입력 순서대로 차례로 저장. <b>순차 접근만</b> 가능, 공간 낭비 적음</td></tr>
+      <tr><td><b>색인 순차 파일</b><br>(ISAM)</td><td>목차(색인)를 따로 둠. <b>순차 접근 + 직접 접근 모두 가능</b></td></tr>
+      <tr><td><b>직접 파일</b><br>(해싱 파일)</td><td>해싱 함수로 주소를 계산해 <b>바로 접근</b>. 가장 빠름</td></tr>
+    </table>
+    <p>데이터베이스(DB)는 <b>여러 사람이 함께 쓰기 위해 통합해 저장한 데이터의 모음</b>이고, 이를 관리해 주는 소프트웨어가 <b>DBMS</b>예요.</p>
+    <table>
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>DB의 4가지 특성</td><td><b>통합</b>된 데이터 · <b>저장</b>된 데이터 · <b>공용</b> 데이터 · <b>운영</b> 데이터</td></tr>
+      <tr><td>DBMS 3대 필수 기능</td><td><b>정의</b>(구조 만들기) · <b>조작</b>(넣고 찾고 고치기) · <b>제어</b>(정확성·보안 유지)</td></tr>
+      <tr><td>스키마 3단계</td><td><b>외부</b>(사용자별 관점, <b>여러 개</b>) · <b>개념</b>(조직 전체 관점, <b>딱 하나</b>) · <b>내부</b>(실제 저장 방식)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — <b>색인 순차 파일만 순차·직접 접근이 모두 된다</b>는 문장, 그리고 <b>개념 스키마는 조직에 단 하나</b>라는 문장이 반복 출제됩니다.</div>
+  </section>
+
+  <section>
+    <h2>4. 통합 구현·IPC·개발 도구</h2>
+    <table>
+      <tr><th>항목</th><th>꼭 기억할 내용</th></tr>
+      <tr><td>단위 모듈</td><td>기능 단위 최소 부품. <b>명세서 + 입·출력 기능 구현</b>으로 구성</td></tr>
+      <tr><td>좋은 모듈</td><td>결합도 <b>낮게</b>, 응집도 <b>높게</b></td></tr>
+      <tr><td>통합 구현 흐름</td><td><b>송신 → (중계 서버) → 수신</b>. 중계 서버는 <b>선택 사항</b></td></tr>
+      <tr><td>IPC 5종</td><td>공유 메모리(공동 칠판) · 소켓(전화선) · 메시지 큐(사서함·비동기) · 파이프(수도관) · RPC(남의 함수 호출)</td></tr>
+      <tr><td>개발 도구</td><td>IDE / 빌드(Ant·Maven·Gradle) / 형상 관리(Git·SVN) / 테스트(JUnit·Selenium) / 협업(Jira)</td></tr>
+    </table>
+    <div class="easy"><b>내일 예고</b> — Day 50부터는 <b>형상 관리</b>(소스 코드의 변경 이력을 관리하는 일)로 들어갑니다. 오늘 표의 "형상 관리 도구 = Git·SVN" 한 줄이 그 출발점이에요.</div>
+    <div class="point"><b>시험 포인트</b> — 이번 주 최우선 3문장: ① <b>이진 탐색은 정렬 필수, O(log₂n)</b> ② <b>해싱은 O(1), 충돌·동의어·오버플로 구분</b> ③ <b>DBMS 3대 기능은 정의·조작·제어</b>.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>2주차 종합 테스트 (15문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 이진 탐색을 사용하기 위한 전제 조건은?",
+  o:["자료가 정렬되어 있어야 한다", "자료가 연결 리스트여야 한다", "자료의 개수가 짝수여야 한다", "자료가 모두 숫자여야 한다"],
+  a:0, e:"이진 탐색은 가운데 값과 비교해 절반을 버리는 방식이므로 반드시 정렬된 자료에만 사용할 수 있습니다."},
+ {q:"2. 순차 탐색으로 n개의 자료에서 값을 찾을 때 평균 비교 횟수는?",
+  o:["n회", "log₂n회", "(n+1)/2회", "n²회"],
+  a:2, e:"처음부터 하나씩 확인하므로 평균적으로 (n+1)/2번 비교하며, 시간 복잡도는 O(n)입니다."},
+ {q:"3. 이진 탐색의 시간 복잡도는?",
+  o:["O(1)", "O(n)", "O(log₂n)", "O(n²)"],
+  a:2, e:"매번 탐색 범위가 절반으로 줄어들기 때문에 O(log₂n)입니다."},
+ {q:"4. 이진 탐색 트리를 중위 순회(Inorder)한 결과의 특징은?",
+  o:["오름차순으로 정렬되어 출력된다", "내림차순으로 정렬되어 출력된다", "루트가 가장 먼저 출력된다", "단말 노드만 출력된다"],
+  a:0, e:"왼쪽 → 루트 → 오른쪽 순서로 방문하므로 작은 값부터 나와 오름차순이 됩니다."},
+ {q:"5. 이진 탐색 트리가 한쪽으로 치우쳐(편향) 만들어졌을 때의 최악 시간 복잡도는?",
+  o:["O(1)", "O(log₂n)", "O(n)", "O(n log n)"],
+  a:2, e:"한 줄로 늘어선 연결 리스트와 같아지므로 O(n)으로 나빠집니다. 이를 막기 위해 AVL 트리 같은 균형 트리를 씁니다."},
+ {q:"6. 해싱에서 서로 다른 키가 같은 주소를 갖게 되는 현상은?",
+  o:["충돌(Collision)", "오버플로(Overflow)", "슬롯(Slot)", "버킷(Bucket)"],
+  a:0, e:"충돌은 같은 주소를 받은 상태이고, 그 주소에 빈 슬롯조차 없는 상태가 오버플로입니다."},
+ {q:"7. 충돌이 발생한 자료들의 집합을 부르는 용어는?",
+  o:["버킷", "슬롯", "동의어(Synonym)", "인덱스"],
+  a:2, e:"같은 해시 주소를 갖게 된 키들의 집합을 동의어(Synonym)라고 합니다."},
+ {q:"8. 가장 일반적으로 사용되며, 키를 소수로 나눈 나머지를 주소로 쓰는 해싱 함수는?",
+  o:["폴딩법", "제산법", "기수 변환법", "숫자 분석법"],
+  a:1, e:"제산법(Division Method)이며, 나누는 수로는 보통 소수를 사용합니다."},
+ {q:"9. 충돌 해결 방법 중 오버플로가 발생한 자료를 연결 리스트로 이어 붙이는 방식은?",
+  o:["선형 탐사법", "체이닝(Chaining)", "재해싱", "제곱법"],
+  a:1, e:"체이닝은 같은 주소의 자료들을 연결 리스트로 매달아 둡니다. 선형 탐사법은 옆의 빈 자리를 찾아가는 개방 주소법입니다."},
+ {q:"10. 순차 접근과 직접 접근이 모두 가능한 파일 구조는?",
+  o:["순차 파일", "색인 순차 파일", "직접 파일", "텍스트 파일"],
+  a:1, e:"색인 순차 파일(ISAM)은 색인(목차)을 통해 직접 접근도 하고, 데이터 영역을 차례로 읽어 순차 접근도 할 수 있습니다."},
+ {q:"11. DBMS의 필수 기능 3가지에 해당하지 않는 것은?",
+  o:["정의 기능", "조작 기능", "제어 기능", "복사 기능"],
+  a:3, e:"DBMS의 3대 필수 기능은 정의(Definition)·조작(Manipulation)·제어(Control)입니다."},
+ {q:"12. 데이터베이스 스키마 중 조직 전체의 관점에서 데이터베이스를 정의하며, 조직에 하나만 존재하는 것은?",
+  o:["외부 스키마", "개념 스키마", "내부 스키마", "물리 스키마"],
+  a:1, e:"개념 스키마는 조직 전체의 통합된 관점으로 단 하나만 존재합니다. 외부 스키마는 사용자마다 여러 개 있을 수 있습니다."},
+ {q:"13. 바람직한 모듈 설계의 원칙으로 옳은 것은?",
+  o:["결합도를 낮추고 응집도를 높인다", "결합도를 높이고 응집도를 낮춘다", "결합도와 응집도를 모두 높인다", "결합도와 응집도를 모두 낮춘다"],
+  a:0, e:"모듈 사이는 최대한 독립적으로(결합도 낮게), 모듈 내부는 한 가지 기능에 집중하게(응집도 높게) 설계합니다."},
+ {q:"14. 프로세스 간 통신(IPC) 방식 중 메시지를 큐에 넣어 두고 상대가 꺼내 가도록 하여 비동기 통신이 가능한 것은?",
+  o:["공유 메모리", "파이프", "메시지 큐", "소켓"],
+  a:2, e:"메시지 큐는 사서함처럼 동작하므로 송신 측과 수신 측이 서로 기다릴 필요가 없습니다."},
+ {q:"15. 다음 중 형상 관리(버전 관리) 도구에 해당하는 것은?",
+  o:["Maven", "JUnit", "Git", "Jira"],
+  a:2, e:"Git·SVN·CVS가 형상 관리 도구입니다. Maven은 빌드, JUnit은 테스트, Jira는 협업 도구입니다. 내일 Day 50부터 형상 관리를 자세히 배웁니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=12?'훌륭해요! 2주차 완벽히 다졌습니다 💪':correct>=9?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 표를 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

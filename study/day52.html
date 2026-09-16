@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 52 · Git과 SVN — 실제로 쓰는 명령어</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  code{background:#f4f6fb;border-radius:4px;padding:1px 5px;font-size:13px;}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 52 · 2과목 소프트웨어 개발</span>
+    <h1>Git과 SVN — 실제로 쓰는 명령어</h1>
+    <p>2026-08-24 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 51)는 버전 관리 도구의 3가지 방식을 배웠어요. 딱 하나만 다시: <b>공유 폴더 = RCS·SCCS</b>, <b>클라이언트/서버 = CVS·SVN</b>, <b>분산 저장소 = Git</b>이었죠. 오늘은 가장 많이 쓰이는 두 도구 <b>SVN과 Git</b>이 실제로 어떤 명령으로 움직이는지 살펴봅니다. 명령어 이름을 <b>기능과 짝지어</b> 묻는 문제가 나옵니다.</p>
+  </section>
+
+  <section>
+    <h2>1. SVN(Subversion)의 특징</h2>
+    <p><b>SVN</b>은 중앙 서버 한 곳에 저장소를 두는 도구예요. 아파치 소프트웨어 재단에서 만들어 공개했습니다.</p>
+    <table>
+      <tr><th>특징</th><th>설명</th></tr>
+      <tr><td>중앙 집중식</td><td>저장소가 <b>서버에 하나</b>. 모든 개발자가 이곳에 접속</td></tr>
+      <tr><td>리비전 번호</td><td>누가 커밋하든 <b>저장소 전체의 번호가 1씩 올라감</b> (1 → 2 → 3 …)</td></tr>
+      <tr><td>파일 잠금 가능</td><td>이미지처럼 <b>합칠 수 없는 파일</b>은 잠금(Lock)을 걸어 한 사람만 수정</td></tr>
+      <tr><td>디렉터리 관리</td><td>파일뿐 아니라 <b>폴더의 이동·이름 변경 이력</b>도 관리</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 회사 공용 서버의 <b>문서 번호</b>와 같아요. 누가 어떤 문서를 수정하든 "제32차 개정"처럼 <b>회사 전체의 개정 번호</b>가 하나씩 올라갑니다.</div>
+    <div class="point"><b>시험 포인트</b> — SVN의 리비전 번호는 <b>파일별로 따로 붙는 것이 아니라 저장소 전체 기준으로 증가</b>합니다. 이 점이 오답 보기로 자주 등장합니다.</div>
+  </section>
+
+  <section>
+    <h2>2. SVN 주요 명령어와 저장소 구조</h2>
+    <table>
+      <tr><th>명령</th><th>하는 일</th></tr>
+      <tr><td><code>import</code></td><td>빈 저장소에 <b>처음으로</b> 파일을 넣음</td></tr>
+      <tr><td><code>checkout</code></td><td>저장소의 파일을 <b>내 작업 공간으로 꺼내 옴</b> (관리 정보 포함)</td></tr>
+      <tr><td><code>export</code></td><td>버전 관리 정보 <b>없이 순수 파일만</b> 꺼내 옴 (배포용)</td></tr>
+      <tr><td><code>add</code></td><td>새로 만든 파일을 <b>관리 대상에 등록</b></td></tr>
+      <tr><td><code>commit</code></td><td>변경 내용을 <b>저장소에 반영</b> (리비전 번호 증가)</td></tr>
+      <tr><td><code>update</code></td><td>저장소의 <b>최신 내용을 내려받아 동기화</b></td></tr>
+      <tr><td><code>diff</code></td><td>변경된 <b>차이점만 비교</b></td></tr>
+      <tr><td><code>info</code></td><td>현재 작업 공간의 <b>정보 확인</b></td></tr>
+      <tr><td><code>revert</code></td><td>수정한 내용을 <b>취소하고 원래대로</b> 되돌림</td></tr>
+    </table>
+    <p>SVN 저장소는 보통 폴더 세 개로 구성해요.</p>
+    <table>
+      <tr><th>폴더</th><th>용도</th></tr>
+      <tr><td><b>trunk</b></td><td>주된 개발이 이루어지는 <b>몸통</b></td></tr>
+      <tr><td><b>branches</b></td><td>따로 갈라 작업하는 <b>가지들</b>을 모아 둠</td></tr>
+      <tr><td><b>tags</b></td><td>출시 시점 등을 <b>이름표 붙여 보관</b> (수정하지 않음)</td></tr>
+    </table>
+    <div class="point"><b>시험 포인트</b> — <b>checkout과 export의 차이</b>가 핵심입니다. checkout은 <b>버전 관리 정보를 함께</b> 가져와 이후 커밋이 가능하고, export는 <b>순수한 파일만</b> 가져와 배포용으로 씁니다.</div>
+  </section>
+
+  <section>
+    <h2>3. Git의 특징 — 두 개의 저장소</h2>
+    <p><b>Git</b>은 리누스 토르발스가 리눅스 개발을 위해 만든 분산 버전 관리 도구예요. 가장 큰 특징은 <b>저장소가 두 개</b>라는 점입니다.</p>
+    <table>
+      <tr><th>저장소</th><th>위치와 역할</th></tr>
+      <tr><td><b>지역(로컬) 저장소</b></td><td><b>내 컴퓨터</b>에 있는 저장소. 혼자서 커밋하고 이력을 쌓음</td></tr>
+      <tr><td><b>원격 저장소</b></td><td><b>서버</b>(예: GitHub)에 있는 저장소. 팀원과 공유</td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — <b>개인 일기장(지역 저장소)</b>에 매일 기록하고, 정리된 내용만 <b>학급 문집(원격 저장소)</b>에 실어 보내는 것과 같아요. 일기는 인터넷 없이도 쓸 수 있으니 SVN보다 자유롭습니다.</div>
+    <div class="point"><b>시험 포인트</b> — Git은 <b>인터넷이 연결되지 않은 상태에서도 지역 저장소에 커밋할 수 있다</b>는 점이 SVN과의 결정적 차이입니다.</div>
+  </section>
+
+  <section>
+    <h2>4. Git의 3단계 영역 — 작업 → 준비 → 저장</h2>
+    <p>Git에서 파일은 세 칸을 차례로 지나갑니다. 이 구조를 이해하면 명령어가 자연스럽게 외워져요.</p>
+    <table>
+      <tr><th>순서</th><th>영역</th><th>설명</th></tr>
+      <tr><td>①</td><td><b>작업 트리</b><br>(Working Tree)</td><td>실제로 파일을 <b>고치는 폴더</b></td></tr>
+      <tr><td>②</td><td><b>스테이지</b><br>(Staging Area, 인덱스)</td><td>커밋할 것만 <b>골라 담아 두는 대기 장소</b></td></tr>
+      <tr><td>③</td><td><b>지역 저장소</b></td><td>커밋이 <b>이력으로 확정되어 쌓이는 곳</b></td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 장을 볼 때 ① 진열대에서 물건을 고르고(작업 트리) ② <b>장바구니에 담고</b>(스테이지) ③ <b>계산을 끝내면</b> 영수증이 남죠(커밋). <code>add</code>는 장바구니에 담기, <code>commit</code>은 계산하기입니다.</div>
+    <div class="point"><b>시험 포인트</b> — Git에만 있는 특징이 바로 이 <b>스테이징 영역(Staging Area)</b>입니다. "<b>커밋할 대상을 선별해 임시로 저장하는 영역</b>"의 답은 스테이지/인덱스예요.</div>
+  </section>
+
+  <section>
+    <h2>5. Git 주요 명령어</h2>
+    <table>
+      <tr><th>명령</th><th>하는 일</th></tr>
+      <tr><td><code>git init</code></td><td>현재 폴더에 <b>새 지역 저장소를 생성</b></td></tr>
+      <tr><td><code>git clone</code></td><td><b>원격 저장소를 통째로 복제</b>해 내 컴퓨터로 가져옴</td></tr>
+      <tr><td><code>git add</code></td><td>변경한 파일을 <b>스테이지에 올림</b></td></tr>
+      <tr><td><code>git commit</code></td><td>스테이지의 내용을 <b>지역 저장소에 확정 저장</b></td></tr>
+      <tr><td><code>git push</code></td><td>지역 저장소의 커밋을 <b>원격 저장소로 올림</b></td></tr>
+      <tr><td><code>git fetch</code></td><td>원격 저장소의 변경 내용을 <b>내려받기만</b> 함(아직 합치지 않음)</td></tr>
+      <tr><td><code>git pull</code></td><td>원격의 내용을 <b>내려받아 바로 합침</b> (fetch + merge)</td></tr>
+      <tr><td><code>git branch</code></td><td>브랜치를 <b>만들거나 목록을 확인</b></td></tr>
+      <tr><td><code>git checkout</code></td><td>다른 <b>브랜치로 이동</b></td></tr>
+      <tr><td><code>git merge</code></td><td>다른 브랜치의 내용을 <b>현재 브랜치에 합침</b></td></tr>
+      <tr><td><code>git log</code></td><td>커밋 <b>이력을 확인</b></td></tr>
+    </table>
+    <div class="easy"><b>한 흐름으로</b> — <code>clone</code>(복제) → 수정 → <code>add</code>(담기) → <code>commit</code>(확정) → <code>push</code>(올리기). 남이 올린 내용을 받을 때는 <code>pull</code>. 이 다섯 단어만 알면 실무 흐름이 끝납니다.</div>
+    <div class="point"><b>시험 포인트</b> — <b>fetch와 pull의 차이</b>(pull = fetch + merge)와 <b>push의 방향</b>(지역 → 원격)이 대표 출제 포인트입니다. 두 사람이 같은 줄을 고쳤을 때 생기는 <b>충돌(Conflict)</b>은 <b>개발자가 직접 내용을 확인해 해결</b>해야 한다는 점도 기억하세요.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. SVN에서 커밋이 이루어질 때 리비전 번호는 어떻게 부여되는가?",
+  o:["파일별로 따로 1씩 증가한다", "저장소 전체를 기준으로 1씩 증가한다", "개발자별로 따로 증가한다", "날짜로만 구분되고 번호는 없다"],
+  a:1, e:"SVN의 리비전 번호는 누가 무엇을 커밋하든 저장소 전체 기준으로 하나씩 올라갑니다."},
+ {q:"2. SVN에서 버전 관리 정보 없이 순수한 파일만 내려받는 명령은?",
+  o:["checkout", "export", "import", "update"],
+  a:1, e:"export는 배포용으로 순수 파일만 가져오고, checkout은 버전 관리 정보까지 함께 가져옵니다."},
+ {q:"3. SVN 저장소 구조에서 주된 개발이 이루어지는 폴더는?",
+  o:["branches", "tags", "hooks", "trunk"],
+  a:3, e:"trunk가 개발의 몸통이고, branches는 갈라진 작업, tags는 출시 시점 보관용입니다."},
+ {q:"4. Git의 가장 큰 특징으로 옳은 것은?",
+  o:["저장소가 중앙 서버에만 존재한다", "지역 저장소와 원격 저장소를 모두 사용한다", "파일 잠금만으로 동시 수정을 막는다", "문서는 관리하지 않고 소스 코드만 관리한다"],
+  a:1, e:"Git은 분산 방식으로, 내 컴퓨터의 지역 저장소와 서버의 원격 저장소를 함께 사용합니다."},
+ {q:"5. Git에서 커밋할 대상을 선별해 임시로 담아 두는 영역은?",
+  o:["작업 트리", "스테이지(Staging Area)", "원격 저장소", "브랜치"],
+  a:1, e:"스테이지(인덱스)이며, 장바구니에 물건을 담는 것과 같습니다. git add로 이곳에 올립니다."},
+ {q:"6. 변경한 파일을 Git의 스테이지에 올리는 명령은?",
+  o:["git add", "git push", "git clone", "git log"],
+  a:0, e:"git add가 스테이지에 올리는 명령이고, git commit이 지역 저장소에 확정 저장하는 명령입니다."},
+ {q:"7. 지역 저장소의 커밋 내용을 원격 저장소로 올리는 명령은?",
+  o:["git pull", "git fetch", "git push", "git merge"],
+  a:2, e:"git push는 지역 → 원격 방향입니다. 반대로 내려받는 것은 pull 또는 fetch입니다."},
+ {q:"8. git pull에 대한 설명으로 옳은 것은?",
+  o:["원격 저장소의 내용을 내려받기만 한다", "원격 저장소의 내용을 내려받아 병합까지 수행한다", "지역 저장소를 새로 만든다", "커밋 이력을 삭제한다"],
+  a:1, e:"pull은 fetch(내려받기) + merge(병합)를 한 번에 수행합니다. 내려받기만 하는 것은 fetch입니다."},
+ {q:"9. 두 개발자가 같은 파일의 같은 부분을 서로 다르게 수정해 병합할 수 없는 상태를 무엇이라 하는가?",
+  o:["충돌(Conflict)", "오버플로(Overflow)", "교착 상태(Deadlock)", "리비전(Revision)"],
+  a:0, e:"충돌(Conflict)이며, 도구가 자동으로 해결할 수 없어 개발자가 직접 내용을 확인해 정리해야 합니다."},
+ {q:"10. (복습) 분산 저장소 방식의 버전 관리 도구로만 묶인 것은?",
+  o:["RCS, SCCS", "CVS, SVN", "Git, Mercurial", "Maven, Gradle"],
+  a:2, e:"Git·Mercurial·Bazaar·Bitkeeper가 분산 저장소 방식입니다. Maven·Gradle은 빌드 도구입니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>

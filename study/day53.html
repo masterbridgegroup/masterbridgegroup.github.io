@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 53 · 빌드 자동화 — Ant·Maven·Gradle과 Jenkins</title>
+<style>
+  :root{--ink:#1a1a2e;--accent:#4361ee;--soft:#f0f3ff;--ok:#2a9d8f;--no:#e63946;--line:#e5e7f0;--point:#fff3e0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--ink);background:#fafbff;line-height:1.75;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 18px 80px;}
+  a.back{color:var(--accent);text-decoration:none;font-size:14px;}
+  .head{margin:14px 0 24px;}
+  .head .tag{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;}
+  .head h1{font-size:23px;font-weight:800;margin-top:10px;}
+  .head p{color:#777;font-size:13px;}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-bottom:16px;}
+  section h2{font-size:17px;color:var(--accent);margin-bottom:10px;}
+  section p{font-size:15px;margin-bottom:10px;}
+  .easy{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0;}
+  .easy b{color:var(--accent);}
+  .point{background:var(--point);border-left:4px solid #fb8500;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px;}
+  .point b{color:#e76f00;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0;}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;}
+  th{background:var(--soft);}
+  code{background:#f4f6fb;border-radius:4px;padding:1px 5px;font-size:13px;}
+  /* quiz */
+  .quiz h2{color:var(--ink);}
+  .q{margin:18px 0 6px;font-weight:700;font-size:15px;}
+  .opts button{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;margin-top:8px;cursor:pointer;font-family:inherit;}
+  .opts button.correct{border-color:var(--ok);background:#e8f5f3;font-weight:700;}
+  .opts button.wrong{border-color:var(--no);background:#fdeaea;}
+  .exp{display:none;background:var(--soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:8px;color:#444;}
+  .score{display:none;background:var(--ink);color:#fff;border-radius:14px;padding:20px;text-align:center;font-size:16px;margin-top:24px;}
+  .score b{font-size:28px;color:#8ecae6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 목록으로</a>
+  <div class="head">
+    <span class="tag">Day 53 · 2과목 소프트웨어 개발</span>
+    <h1>빌드 자동화 — Ant·Maven·Gradle과 Jenkins</h1>
+    <p>2026-08-25 · 오늘 배울 개념 5개 + 퀴즈 10문제 (약 1시간)</p>
+  </div>
+
+  <section>
+    <h2>복습 한 스푼 🥄</h2>
+    <p>어제(Day 52)는 SVN과 Git의 명령어를 배웠어요. 딱 하나만 다시: Git은 <b>작업 트리 → 스테이지(add) → 지역 저장소(commit) → 원격 저장소(push)</b> 순서로 흘러가고, <b>pull = fetch + merge</b>였죠. 오늘은 그렇게 모은 소스 코드를 <b>실행 가능한 프로그램으로 자동 변환</b>하는 빌드 자동화를 배웁니다.</p>
+  </section>
+
+  <section>
+    <h2>1. 빌드란? — 소스 코드를 실행 파일로 만드는 일</h2>
+    <p><b>빌드</b>(Build)는 개발자가 쓴 소스 코드를 <b>컴퓨터가 실행할 수 있는 형태로 바꾸고, 필요한 부품을 챙겨 하나의 결과물로 묶는 전체 과정</b>이에요. 단순히 컴파일 하나만을 뜻하는 것이 아닙니다.</p>
+    <table>
+      <tr><th>순서</th><th>단계</th><th>내용</th></tr>
+      <tr><td>①</td><td>컴파일<br>(Compile)</td><td>사람이 쓴 코드를 <b>기계어로 번역</b></td></tr>
+      <tr><td>②</td><td>링크<br>(Link)</td><td>번역된 조각들과 <b>라이브러리를 연결</b></td></tr>
+      <tr><td>③</td><td>테스트<br>(Test)</td><td>자동 <b>단위 테스트를 실행</b>해 오류 확인</td></tr>
+      <tr><td>④</td><td>패키징<br>(Packaging)</td><td>실행 파일과 자원을 <b>하나의 묶음으로 포장</b> (예: jar, war)</td></tr>
+      <tr><td>⑤</td><td>배포<br>(Deploy)</td><td>서버나 사용자에게 <b>전달·설치</b></td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 라면을 끓이는 과정이 빌드예요. 면을 삶고(컴파일), 스프를 넣고(링크), 간을 보고(테스트), 그릇에 담고(패키징), 상에 내는(배포) 일이 <b>한 번의 버튼으로 자동</b>으로 되게 만드는 것이 빌드 자동화입니다.</div>
+    <div class="point"><b>시험 포인트</b> — "빌드 = 컴파일만"이라는 보기는 <b>오답</b>입니다. 빌드는 <b>컴파일·링크·테스트·패키징·배포를 포함하는 전체 과정</b>이라고 기억하세요.</div>
+  </section>
+
+  <section>
+    <h2>2. 빌드 자동화 도구 — 왜 필요한가</h2>
+    <p>사람이 매번 손으로 빌드하면 순서를 빠뜨리거나 실수하기 쉬워요. <b>빌드 자동화 도구</b>는 이 과정을 <b>스크립트(작업 순서를 적어 둔 파일)에 따라 자동 실행</b>합니다.</p>
+    <table>
+      <tr><th>이점</th><th>설명</th></tr>
+      <tr><td>반복 작업 제거</td><td>명령 한 번으로 <b>매번 똑같은 순서</b>대로 실행</td></tr>
+      <tr><td>휴먼 에러 감소</td><td>사람이 순서를 빠뜨릴 <b>여지를 없앰</b></td></tr>
+      <tr><td>의존성 자동 관리</td><td>필요한 <b>라이브러리를 스스로 내려받아</b> 연결</td></tr>
+      <tr><td>빠른 오류 발견</td><td>빌드할 때마다 <b>테스트가 자동 실행</b>되어 문제를 조기에 발견</td></tr>
+    </table>
+    <div class="easy"><b>의존성이란?</b> — 내 프로그램이 <b>동작하기 위해 반드시 필요한 다른 부품(라이브러리)</b>을 말해요. "이 프로그램은 A 라이브러리에 <b>의존한다</b>"는 뜻입니다. Maven·Gradle의 가장 큰 장점이 이 의존성을 자동으로 챙겨 온다는 점이에요.</div>
+    <div class="point"><b>시험 포인트</b> — 빌드 자동화 도구의 3대 기능은 <b>① 빌드 실행 ② 의존성(라이브러리) 관리 ③ 테스트 자동 수행</b>입니다.</div>
+  </section>
+
+  <section>
+    <h2>3. Ant · Maven · Gradle 비교 — 빌드 3형제</h2>
+    <table>
+      <tr><th>도구</th><th>설정 파일</th><th>특징</th></tr>
+      <tr><td><b>Ant</b><br>(Another Neat Tool)</td><td><code>build.xml</code><br>(XML)</td><td>가장 <b>오래된</b> 자바 빌드 도구. 작업 순서를 <b>직접 하나하나 적어야</b> 함. 의존성 자동 관리 기능이 <b>없음</b></td></tr>
+      <tr><td><b>Maven</b></td><td><code>pom.xml</code><br>(XML)</td><td><b>의존성 자동 관리</b>가 핵심. 정해진 <b>생애 주기(Life Cycle)</b>에 따라 빌드. 인터넷의 중앙 저장소에서 라이브러리를 내려받음</td></tr>
+      <tr><td><b>Gradle</b></td><td><code>build.gradle</code><br>(Groovy 기반 스크립트)</td><td>Ant와 Maven의 장점을 합친 <b>최신 도구</b>. <b>태스크(Task) 단위</b>로 실행, 이전 빌드 결과를 재사용해 <b>속도가 빠름</b>. <b>안드로이드 앱</b>의 표준 빌드 도구</td></tr>
+    </table>
+    <div class="easy"><b>한 줄 구분</b> — Ant는 <b>수동 레시피</b>(내가 순서를 다 적음), Maven은 <b>정식 요리법</b>(정해진 순서를 따르고 재료는 알아서 배달), Gradle은 <b>스마트 주방</b>(빠르고 유연하며 안드로이드 기본).</div>
+    <div class="point"><b>시험 포인트</b> — ① <b>Ant는 의존성 관리 기능이 없다</b> ② <b>Maven의 설정 파일은 pom.xml</b> ③ <b>Gradle은 Groovy 기반이며 안드로이드 기본 빌드 도구</b>. 이 세 문장이 그대로 보기로 나옵니다.</div>
+  </section>
+
+  <section>
+    <h2>4. Jenkins — 빌드를 대신 눌러 주는 서버</h2>
+    <p><b>Jenkins</b>(젠킨스)는 <b>Java로 만든 오픈 소스 빌드 자동화 서버</b>예요. 개발자가 소스를 커밋하면 <b>Jenkins가 알아서 빌드와 테스트를 실행</b>하고 결과를 알려 줍니다.</p>
+    <table>
+      <tr><th>특징</th><th>설명</th></tr>
+      <tr><td>웹 기반 관리</td><td>브라우저 화면(GUI)에서 <b>클릭으로 설정</b>. 다루기 쉬움</td></tr>
+      <tr><td>형상 관리 연동</td><td><b>Git·SVN 등 대부분의 도구와 연결</b> 가능</td></tr>
+      <tr><td>서버에서 동작</td><td>서블릿 컨테이너(Tomcat 등) 위에서 실행되는 <b>서버형 도구</b></td></tr>
+      <tr><td>플러그인 확장</td><td>필요한 기능을 <b>플러그인으로 추가</b></td></tr>
+    </table>
+    <div class="easy"><b>비유</b> — 밥솥의 <b>예약 취사</b> 기능이에요. 쌀만 씻어 넣으면(커밋) 정해진 시각이나 조건에 <b>알아서 밥을 짓고</b>(빌드) 다 되면 알려 줍니다. 사람이 지켜보지 않아도 되죠.</div>
+    <div class="point"><b>시험 포인트</b> — "<b>Java 기반의 오픈 소스이며, 웹 기반 GUI를 제공하고 대부분의 형상 관리 도구와 연동되는 빌드 자동화 도구는?</b>" → <b>Jenkins</b>. 문장을 통째로 외워 두세요.</div>
+  </section>
+
+  <section>
+    <h2>5. CI / CD — 계속 합치고 계속 배포한다</h2>
+    <table>
+      <tr><th>용어</th><th>뜻</th></tr>
+      <tr><td><b>CI</b><br>(Continuous Integration,<br>지속적 통합)</td><td>개발자들이 고친 코드를 <b>하루에도 여러 번 합치고 그때마다 자동 빌드·테스트</b>. 문제를 <b>작을 때 발견</b>하는 것이 목적</td></tr>
+      <tr><td><b>CD</b><br>(Continuous Delivery/Deployment,<br>지속적 제공·배포)</td><td>테스트를 통과한 결과물을 <b>자동으로 배포 가능한 상태로 만들거나 실제 서비스에 올림</b></td></tr>
+    </table>
+    <div class="easy"><b>왜 자꾸 합칠까?</b> — 3개월 동안 각자 작업한 뒤 한 번에 합치면 충돌이 산더미처럼 쌓여요. 매일 조금씩 합치면 문제도 조금씩만 생깁니다. 이것이 CI의 핵심 아이디어예요.</div>
+    <div class="point"><b>시험 포인트</b> — CI의 목적은 <b>"통합에서 생기는 문제를 조기에 발견"</b>이고, 이를 실행하는 대표 도구가 <b>Jenkins</b>입니다. 내일(Day 54)은 완성된 제품을 사용자에게 전달하는 <b>패키징</b>을 배웁니다.</div>
+  </section>
+
+  <section class="quiz">
+    <h2>오늘의 퀴즈 (10문제)</h2>
+    <p style="font-size:13px;color:#777;">보기를 누르면 바로 채점되어요. 다 풀면 아래에 점수가 나옵니다.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="scoreBox"></div>
+  </section>
+
+  <a class="back" href="index.html">← 목록으로</a>
+</div>
+
+<script>
+const QUIZ = [
+ {q:"1. 빌드(Build)에 대한 설명으로 가장 옳은 것은?",
+  o:["소스 코드를 컴파일하는 작업만을 뜻한다", "컴파일·링크·테스트·패키징·배포를 포함하는 전체 과정이다", "소스 코드의 변경 이력을 관리하는 활동이다", "요구사항을 명세서로 정리하는 단계다"],
+  a:1, e:"빌드는 소스 코드를 실행 가능한 결과물로 만들기까지의 전 과정을 말합니다."},
+ {q:"2. 빌드 자동화 도구의 기능으로 적절하지 않은 것은?",
+  o:["빌드 과정 자동 실행", "라이브러리 의존성 자동 관리", "테스트 자동 수행", "요구사항 우선순위 결정"],
+  a:3, e:"요구사항 우선순위 결정은 요구사항 분석 단계의 활동으로 빌드 도구의 기능이 아닙니다."},
+ {q:"3. 다음 중 자바 기반의 가장 오래된 빌드 도구로, 의존성 자동 관리 기능이 없는 것은?",
+  o:["Ant", "Maven", "Gradle", "Jenkins"],
+  a:0, e:"Ant는 build.xml에 작업 순서를 직접 기술해야 하며 의존성 관리 기능이 없습니다."},
+ {q:"4. Maven의 빌드 설정 파일 이름은?",
+  o:["build.xml", "pom.xml", "build.gradle", "package.json"],
+  a:1, e:"Maven은 pom.xml, Ant는 build.xml, Gradle은 build.gradle을 사용합니다."},
+ {q:"5. Groovy 기반 스크립트를 사용하며 안드로이드 앱 개발의 표준 빌드 도구로 쓰이는 것은?",
+  o:["Ant", "Maven", "Gradle", "SVN"],
+  a:2, e:"Gradle은 Groovy 기반이며 태스크 단위로 실행되고 이전 빌드 결과를 재사용해 빠릅니다."},
+ {q:"6. Java로 개발된 오픈 소스 도구로, 웹 기반 GUI를 제공하고 대부분의 형상 관리 도구와 연동되는 빌드 자동화 도구는?",
+  o:["Jenkins", "Selenium", "JUnit", "Eclipse"],
+  a:0, e:"Jenkins입니다. Selenium은 웹 테스트, JUnit은 단위 테스트, Eclipse는 IDE입니다."},
+ {q:"7. 개발자가 작성한 코드를 하루에도 여러 번 통합하고 그때마다 자동으로 빌드·테스트하여 문제를 조기에 발견하는 활동은?",
+  o:["CD(지속적 배포)", "CI(지속적 통합)", "형상 감사", "리팩토링"],
+  a:1, e:"CI(Continuous Integration, 지속적 통합)이며 대표 도구가 Jenkins입니다."},
+ {q:"8. 내 프로그램이 동작하기 위해 반드시 필요한 다른 라이브러리와의 관계를 무엇이라 하는가?",
+  o:["결합도", "의존성(Dependency)", "응집도", "리비전"],
+  a:1, e:"의존성(Dependency)이며 Maven·Gradle이 자동으로 내려받아 관리해 줍니다."},
+ {q:"9. 빌드 과정에서 실행 파일과 자원을 하나의 묶음(jar, war 등)으로 포장하는 단계는?",
+  o:["컴파일", "링크", "패키징", "배포"],
+  a:2, e:"패키징(Packaging) 단계입니다. 이후 배포(Deploy) 단계에서 사용자에게 전달됩니다."},
+ {q:"10. (복습) Git에서 원격 저장소의 변경 내용을 내려받기만 하고 병합은 하지 않는 명령은?",
+  o:["git push", "git fetch", "git pull", "git add"],
+  a:1, e:"fetch는 내려받기만 하고, pull은 내려받은 뒤 병합(merge)까지 수행합니다."}
+];
+
+const box = document.getElementById('quizBox');
+let answered = 0, correct = 0;
+QUIZ.forEach((item,i)=>{
+  const qd = document.createElement('div');
+  qd.innerHTML = '<div class="q">'+item.q+'</div>';
+  const opts = document.createElement('div'); opts.className='opts';
+  item.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>{
+      if(qd.dataset.done) return;
+      qd.dataset.done = 1; answered++;
+      if(j===item.a){ b.classList.add('correct'); correct++; }
+      else { b.classList.add('wrong'); opts.children[item.a].classList.add('correct'); }
+      exp.style.display='block';
+      if(answered===QUIZ.length){
+        const s=document.getElementById('scoreBox');
+        s.style.display='block';
+        s.innerHTML='오늘의 점수 <b>'+correct+' / '+QUIZ.length+'</b><br>'+
+          (correct>=8?'훌륭해요! 내일 새 내용으로 만나요 💪':correct>=6?'좋아요! 틀린 문제 해설만 한 번 더 읽어보세요.':'괜찮아요. 위 개념을 한 번 더 읽고 자면 내일은 더 잘 풀려요.');
+        s.scrollIntoView({behavior:'smooth'});
+      }
+    };
+    opts.appendChild(b);
+  });
+  const exp = document.createElement('div'); exp.className='exp'; exp.textContent='해설: '+item.e;
+  qd.appendChild(opts); qd.appendChild(exp);
+  box.appendChild(qd);
+});
+
+</script>
+</body>
+</html>
